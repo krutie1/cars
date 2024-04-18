@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,15 +14,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function() {
-    return view('clients');
-});
+
+// add controllers
+// admin manager
+Route::get('/', [ClientController::class, 'index'])->name('clients.index');
 
 Route::get('/visits', function() {
     return view('visits');
 });
 
+// admin
 Route::get('/managers', function() {
     return view('managers');
 });
+
+// Client Controller Routes
+Route::post('/createClient', [ClientController::class, 'create']);
 
