@@ -3,56 +3,67 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Unique;
 
 class ClientController extends Controller
 {
-    //
-    public function create(Request $request)
+    public function store(Request $request)
     {
-//        dd('tut');
-        /*try {*/
-            $validated = $request->validate([
-                'phone_number' => ['required', 'regex:/^(?:\+?7|8)\d{10}$/', 'unique:clients'],
-                'full_name' => 'required'
-            ]);
+        $validated = $request->validate([
+            'phone_number' => ['required', 'regex:/^8\d{10}$/', (new Unique('clients'))->withoutTrashed()],
+            'full_name' => 'required'
+        ], [
+            'unique' => 'Пользователь с таким номером телефона уже существует',
+        ]);
 
-            $client = Client::create($validated);
-
-//            return redirect()->route('clients.index')
-//                ->with('success', 'Product created successfully.' . $client->phone_number);
-            return response()->json([
-                'success' => true,
-                'message' => 'Client created successfully',
-                'client' => $client
-            ]);
-        /*} catch (ValidationException $th) {
-            return new JsonResponse($th->validator->errors(), 422);
-        }*/
+        $client = Client::create($validated);
+        return response()->json([
+            'success' => true,
+            'message' => 'Добавление клиента завершено успешно',
+            'client' => $client
+        ]);
     }
 
     public function index(Request $request)
     {
-        return view('clients');
+        $clients = Client::orderBy('id', 'desc')->paginate(12);
+        return view('clients', compact('clients'));
     }
 
-    public function destroy(Request $request, $id) {
-        $client = Client::findOrFail($id);
+    public function destroy(Request $request, $phone_number)
+    {
+        $client = Client::firstWhere('phone_number', $phone_number);
+
+        if (!$client) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Клиент не найден',
+            ], Response::HTTP_NOT_FOUND);
+        }
 
         if ($client->delete()) {
+
             return response()->json([
                 'success' => true,
-                'message' => 'Client deleted successfully',
+                'message' => 'Клиент успешно удалён',
                 'client' => $client
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Client could not be deleted',
+                'message' => 'Ошибка при удалении клиента',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function show(Request $request, $id)
+    {
+    }
+
+    public function update(Request $request, $id)
+    {
+    }
+
 }

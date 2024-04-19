@@ -28,11 +28,13 @@ Route::get('/managers', function() {
     return view('managers');
 });
 
+
+Route::resource('client', ClientController::class);
 // Client Controller Routes
-Route::prefix('client')->group(function() {
-    Route::get('/', [ClientController::class, 'index'])->name('clients.index');
-    Route::post('/create', [ClientController::class, 'create']);
-    Route::delete('/{id}', [ClientController::class, 'destroy']);
-});
+//Route::prefix('/client')->group(function() {
+//    Route::get('/', [ClientController::class, 'index'])->name('clients.index');
+//    Route::post('/create', [ClientController::class, 'create']);
+//    Route::delete('/{id}', [ClientController::class, 'destroy']);
+//});
 
 

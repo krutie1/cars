@@ -105,10 +105,20 @@ input[type="color"]:focus,
     outline: 0 none;
 }
 
+th {
+    vertical-align: middle;
+}
+
+.nav-item a {
+    display: flex;
+    align-items: center;
+}
+
 main {
     display: flex;
     height: 100vh;
 }
+
 .navbar {
     height: 100%;
 }
@@ -116,5 +126,30 @@ main {
 .main-right {
     background: var(--col-white);
     width: 100%;
-    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.main-left {
+    width: 280px;
+}
+
+.small-table-column {
+    width: 40px;
+}
+
+@media (max-width: 992px) {
+    .main-left {
+        width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-item a {
+        justify-content: center;
+        height: 50px;
+    }
+
+    .nav-pills .nav-link {
+        border-radius: 0;
+    }
 }
