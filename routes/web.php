@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 // add controllers
 // admin manager
-Route::get('/', [ClientController::class, 'index'])->name('clients.index');
+//Route::get('/', [ClientController::class, 'index'])->name('clients.index');
 
 Route::get('/visits', function() {
     return view('visits');
@@ -29,5 +29,10 @@ Route::get('/managers', function() {
 });
 
 // Client Controller Routes
-Route::post('/createClient', [ClientController::class, 'create']);
+Route::prefix('client')->group(function() {
+    Route::get('/', [ClientController::class, 'index'])->name('clients.index');
+    Route::post('/create', [ClientController::class, 'create']);
+    Route::delete('/{id}', [ClientController::class, 'destroy']);
+});
+
 

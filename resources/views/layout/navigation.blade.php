@@ -6,7 +6,7 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="/" class="nav-link {{ Request::is('/') ? 'active' : 'text-white'}}" aria-current="{{ Request::is('/') ? 'page' : ''}}">
+            <a href="/client" class="nav-link {{ Request::is('client*') ? 'active' : 'text-white'}}" aria-current="{{ Request::is('/client') ? 'page' : ''}}">
                 {{--                        <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>--}}
                 Клиенты
             </a>

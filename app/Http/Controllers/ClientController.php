@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 
 class ClientController extends Controller
@@ -36,5 +37,22 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         return view('clients');
+    }
+
+    public function destroy(Request $request, $id) {
+        $client = Client::findOrFail($id);
+
+        if ($client->delete()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Client deleted successfully',
+                'client' => $client
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Client could not be deleted',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

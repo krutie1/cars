@@ -27,7 +27,7 @@ function createClient() {
         var $form = $( this ),
             name = $form.find( "input[name='full_name']" ).val(),
             number = $form.find( "input[name='phone_number']" ).val(),
-            url = "/createClient"
+            url = "/client/create"
 
         $.ajax({
             type: "POST",
@@ -43,5 +43,33 @@ function createClient() {
         });
 
 
+    });
+}
+
+function getClient() {
+
+}
+
+function confirmDelete(rowId) {
+    if (confirm("Are you sure you want to delete this row?")) {
+        // User confirmed, delete the row
+        deleteClient(rowId);
+    }
+}
+
+function deleteClient(id) {
+    $.ajax({
+        url: '/client/' + id, // Replace '/clients/' with your actual delete endpoint
+        type: 'DELETE',
+        responseType: 'json',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Client deleted successfully:', response.client);
+            // Handle success response here (e.g., update UI, show message)
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to delete client:', error);
+            // Handle error response here (e.g., show error message)
+        }
     });
 }

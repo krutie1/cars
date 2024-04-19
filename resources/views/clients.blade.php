@@ -40,6 +40,9 @@
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#clientsModal" data-bs-whatever="@mdo">Редактировать
                             </button>
+                            <button onclick="confirmDelete(2)"  id="button-delete" type="button" class="btn btn-danger">
+                                Удалить
+                            </button>
                         </td>
                     </tr>
                     <tr>
@@ -50,6 +53,10 @@
                         <td>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#clientsModal" data-bs-whatever="@fat">Редактировать
+                            </button>
+
+                            <button id="button-delete" onclick="confirmDelete(3)" type="button" class="btn btn-danger">
+                                Удалить
                             </button>
                         </td>
                     </tr>
@@ -97,7 +104,7 @@
                 </div>
                 <div class="modal-body">
 {{--                    <form method="POST" action="/createClient">--}}
-                    <form id="createClient">
+                    <form id="/client/create">
                         <div class="mb-3">
                             <label for="client-name" class="col-form-label">Введите имя:</label>
                             <input type="text" name="full_name" class="form-control" id="client_name" autocomplete="off">
