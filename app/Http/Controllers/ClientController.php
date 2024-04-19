@@ -29,6 +29,7 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         $clients = Client::orderBy('id', 'desc')->paginate(12);
+        // join
         return view('clients', compact('clients'));
     }
 

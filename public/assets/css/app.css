@@ -135,6 +135,7 @@ main {
 
 .small-table-column {
     width: 40px;
+    text-align: center;
 }
 
 @media (max-width: 992px) {
