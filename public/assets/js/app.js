@@ -73,7 +73,7 @@ function createClient() {
         var $form = $(this),
             name = $form.find("input[name='full_name']").val(),
             number = $form.find("input[name='phone_number']").val(),
-            url = "/client"
+            url = "/client/create"
 
         $.ajax({
             type: "POST",
@@ -119,10 +119,6 @@ function createClientModal() {
             editClient(client.id, {name: clientName.val(), number: clientNumber.val()});
         });
     });
-}
-
-function getClient() {
-
 }
 
 function confirmDelete(rowId) {

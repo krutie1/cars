@@ -22,7 +22,7 @@ class ClientController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Добавление клиента завершено успешно',
+            'message' => 'Клиент успешно создан',
             'client' => $client
         ]);
     }
@@ -49,8 +49,22 @@ class ClientController extends Controller
         }
     }
 
-    public function show(Request $request, $id)
+    public function show(Request $request, $phone_number)
     {
+        ;
+    }
+
+    public function findByPhoneNumber(Request $request)
+    {
+        $phone_number = $request->input('phone_number');
+
+        if (empty($phone_number)) {
+            $clients = Client::orderBy('id', 'desc')->paginate(12);
+        } else {
+            $clients = Client::orderBy('id', 'desc')->where('phone_number', $phone_number)->paginate(12);
+        }
+
+        return view('clients', compact('clients'));
     }
 
     public function update(Request $request, Client $client)

@@ -33,7 +33,8 @@ Route::get('/managers', function () {
 // Client Controller Routes
 Route::prefix('/client')->group(function () {
     Route::get('/', [ClientController::class, 'index'])->name('clients.index');
-    Route::post('/create', [ClientController::class, 'create']);
+    Route::post('/create', [ClientController::class, 'store']);
+    Route::get('/find-by-phone', [ClientController::class, 'findByPhoneNumber'])->name('client.findByPhone');
     Route::delete('/{client}', [ClientController::class, 'destroy']);
     Route::put('/{client}', [ClientController::class, 'update']);
 });
