@@ -13,12 +13,15 @@ class ClientController extends Controller
     {
         $validated = $request->validate([
             'phone_number' => ['required', 'regex:/^8\d{10}$/', (new Unique('clients'))->withoutTrashed()],
-            'full_name' => 'required'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'patronymic' => 'nullable'
         ], [
             'unique' => 'Пользователь с таким номером телефона уже существует',
         ]);
 
         $client = Client::create($validated);
+
 
         return response()->json([
             'success' => true,
@@ -71,7 +74,9 @@ class ClientController extends Controller
     {
         $validated = $request->validate([
             'phone_number' => ['required', 'regex:/^8\d{10}$/', (new Unique('clients'))->withoutTrashed()->ignoreModel($client)],
-            'full_name' => 'required'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'patronymic' => 'nullable',
         ], [
             'unique' => 'Пользователь с таким номером телефона уже существует',
         ]);
@@ -79,13 +84,13 @@ class ClientController extends Controller
         if ($client->update($validated)) {
             return response()->json([
                 'success' => true,
-                'message' => 'Клиент успешно удалён',
+                'message' => 'Данные успешно изменены',
                 'client' => $client
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка при удалении клиента',
+                'message' => 'Ошибка при редактировании клиента',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

@@ -25,7 +25,7 @@
             <h2 class="text-center mb-3">Список Клиентов</h2>
             <div class="table-responsive">
                 @if($clients->isEmpty())
-                    <p>Клиент не найден.</p>
+                    <p>Список клиентов пуст.</p>
                 @else
                     <table
                         class="table table-bordered">
@@ -43,11 +43,11 @@
                             <tr>
                                 <td>{{ $client -> id}}</td>
                                 <td>{{ $client -> phone_number}}</td>
-                                <td>{{ $client -> full_name}}</td>
+                                <td>{{ $client->last_name }} {{ $client->first_name }} {{ $client->patronymic }}</td>
                                 <td>{{ $client -> created_at}}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#clientsModal" data-client="{{ json_encode($client) }}">
+                                            data-bs-target="#editClientModal" data-client="{{ json_encode($client) }}">
                                         Р
                                     </button>
                                     <button onclick="confirmDelete({{ $client -> id }})" id="button-delete"
@@ -65,68 +65,7 @@
             </div>
         </div>
     </div>
-    {{--    Edit Client Modal--}}
-    <div class="modal fade" id="clientsModal" tabindex="-1" aria-labelledby="clientsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="clientsModalLabel">New message</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Номер телефона:</label>
-                            <input type="text" class="form-control" id="client-number">
-                        </div>
-                        <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">ФИО:</label>
-                            <input type="text" class="form-control" id="client-name">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="edit-btn">Сохранить</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    {{--    Create Client Modal--}}
-    <div class="modal fade" id="createClientModal" tabindex="-1" aria-labelledby="createClientModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createClientModal">Новый клиент</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {{--                    <form method="POST" action="/createClient">--}}
-                    <form id="createClient">
-                        <div class="mb-3">
-                            <label for="client-number" class="col-form-label">Введите номер телефона:</label>
-                            <input type="text" name="phone_number" class="form-control" id="client_number"
-                                   autocomplete="off">
-                            <div id="client-number-error" class="invalid-feedback"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="client-name" class="col-form-label">Введите имя:</label>
-                            <input type="text" name="full_name" class="form-control" id="client_name"
-                                   autocomplete="off">
-                            <div id="client-name-error" class="invalid-feedback"></div>
-                        </div>
-                        <div id="create-general-error" class="invalid-feedback"></div>
-                        <br>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">Добавить клиента</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    @include('layout.editClientModal')
+    @include('layout.createClientModal')
 @endsection

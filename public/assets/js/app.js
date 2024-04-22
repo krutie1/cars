@@ -49,7 +49,7 @@ $(document).ready(function () {
         "hideMethod": "fadeOut"
     }
 
-    createClientModal();
+    initEditModal();
     createClient();
 
     (function () {
@@ -64,21 +64,27 @@ function createClient() {
     $('#createClient').on('submit', function (e) {
         e.preventDefault();
 
-        $('#client_name').removeClass('is-invalid');
-        $('#client-name-error').text('');
+        $('#client_firstname').removeClass('is-invalid');
+        $('#first-name-error').text('');
+        $('#client_lastname').removeClass('is-invalid');
+        $('#last-name-error').text('');
+        $('#client_patronymic').removeClass('is-invalid');
+        $('#patronymic-error').text('');
         $('#client_number').removeClass('is-invalid');
         $('#client-number-error').text('');
 
 
         var $form = $(this),
-            name = $form.find("input[name='full_name']").val(),
+            first_name = $form.find("input[name='first_name']").val(),
+            last_name = $form.find("input[name='last_name']").val(),
+            patronymic = $form.find("input[name='patronymic']").val(),
             number = $form.find("input[name='phone_number']").val(),
             url = "/client/create"
 
         $.ajax({
             type: "POST",
             url: url,
-            data: {full_name: name, phone_number: number},
+            data: {first_name: first_name, last_name: last_name, patronymic: patronymic, phone_number: number},
             dataType: "json",
             success: function (data) {
                 alertMessage.saveMessage(data)
@@ -86,9 +92,19 @@ function createClient() {
                 window.location.reload();
             },
             error: function (xhr, status, error) {
-                if (xhr.responseJSON.errors.hasOwnProperty('full_name')) {
-                    $('#client_name').addClass('is-invalid');
-                    $('#client-name-error').text(xhr.responseJSON.errors.full_name[0]);
+                if (xhr.responseJSON.errors.hasOwnProperty('first_name')) {
+                    $('#client_firstname').addClass('is-invalid');
+                    $('#first-name-error').text(xhr.responseJSON.errors.first_name[0]);
+                }
+
+                if (xhr.responseJSON.errors.hasOwnProperty('last_name')) {
+                    $('#client_lastname').addClass('is-invalid');
+                    $('#last-name-error').text(xhr.responseJSON.errors.last_name[0]);
+                }
+
+                if (xhr.responseJSON.errors.hasOwnProperty('patronymic')) {
+                    $('#client_patronymic').addClass('is-invalid');
+                    $('#patronymic-error').text(xhr.responseJSON.errors.patronymic[0]);
                 }
 
                 if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
@@ -96,27 +112,6 @@ function createClient() {
                     $('#client-number-error').text(xhr.responseJSON.errors.phone_number[0]);
                 }
             }
-        });
-    });
-}
-
-function createClientModal() {
-    $('#clientsModal').on('show.bs.modal', function (event) {
-        // Button that triggered the modal
-        var button = $(event.relatedTarget);
-        // Extract info from data-bs-* attributes
-        var client = button.data('client');
-
-        var modalTitle = $('#clientsModal').find('.modal-title');
-        var clientNumber = $('#clientsModal').find('#client-number');
-        var clientName = $('#clientsModal').find('#client-name');
-
-        modalTitle.text(`Редактирования клиента: ${client.full_name}`);
-        clientNumber.val(client.phone_number);
-        clientName.val(client.full_name);
-
-        $('#edit-btn').on('click', function () {
-            editClient(client.id, {name: clientName.val(), number: clientNumber.val()});
         });
     });
 }
@@ -147,18 +142,71 @@ function deleteClient(id) {
     });
 }
 
+function initEditModal() {
+    $('#editClientModal').on('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = $(event.relatedTarget);
+        // Extract info from data-bs-* attributes
+        var client = button.data('client');
+
+        var modalTitle = $('#editClientModal').find('.modal-title');
+        var clientNumber = $('#editClientModal').find('#edit-client-number');
+        var clientFirstName = $('#editClientModal').find('#edit-client-firstname');
+        var clientLastName = $('#editClientModal').find('#edit-client-lastname');
+        var clientPatronymic = $('#editClientModal').find('#edit-client-patronymic');
+
+        modalTitle.text(`Редактирования клиента: ${client.first_name}`);
+        clientNumber.val(client.phone_number);
+        clientFirstName.val(client.first_name);
+        clientLastName.val(client.last_name);
+        clientPatronymic.val(client.patronymic);
+
+        $('#edit-btn').on('click', function () {
+            editClient(client.id, {
+                first_name: clientFirstName.val(),
+                last_name: clientLastName.val(),
+                patronymic: clientPatronymic.val(),
+                number: clientNumber.val()
+            });
+        });
+    });
+}
+
 function editClient(id, client) {
     $.ajax({
         type: "PUT",
         url: `/client/${id}`,
-        data: {full_name: client.name, phone_number: client.number},
+        data: {
+            first_name: client.first_name,
+            last_name: client.last_name,
+            patronymic: client.patronymic,
+            phone_number: client.number
+        },
         success: function (data) {
             alertMessage.saveMessage(data)
 
             window.location.reload();
         },
         error: function (xhr, status, error) {
+            if (xhr.responseJSON.errors.hasOwnProperty('first_name')) {
+                $('#edit-client-firstname').addClass('is-invalid');
+                $('#edit-first-name-error').text(xhr.responseJSON.errors.first_name[0]);
+            }
 
+            if (xhr.responseJSON.errors.hasOwnProperty('last_name')) {
+                $('#edit-client-lastname').addClass('is-invalid');
+                $('#edit-last-name-error').text(xhr.responseJSON.errors.last_name[0]);
+            }
+
+            if (xhr.responseJSON.errors.hasOwnProperty('patronymic')) {
+                $('#edit-client-patronymic').addClass('is-invalid');
+                $('#edit-patronymic-error').text(xhr.responseJSON.errors.patronymic[0]);
+            }
+
+            if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
+                $('#edit-client-number').addClass('is-invalid');
+                $('#edit-client-number-error').text(xhr.responseJSON.errors.phone_number[0]);
+            }
         }
     });
 }

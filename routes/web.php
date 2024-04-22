@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Route;
 
 // add controllers
 // admin manager
-//Route::get('/', [ClientController::class, 'index'])->name('clients.index');
+Route::get('/', function () {
+    return view('login');
+});
 
 Route::get('/visits', function () {
     return view('visits');
