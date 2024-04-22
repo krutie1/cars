@@ -19,6 +19,7 @@ class ClientController extends Controller
         ]);
 
         $client = Client::create($validated);
+
         return response()->json([
             'success' => true,
             'message' => 'Добавление клиента завершено успешно',
@@ -29,23 +30,12 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         $clients = Client::orderBy('id', 'desc')->paginate(12);
-        // join
         return view('clients', compact('clients'));
     }
 
-    public function destroy(Request $request, $phone_number)
+    public function destroy(Request $request, Client $client)
     {
-        $client = Client::firstWhere('phone_number', $phone_number);
-
-        if (!$client) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Клиент не найден',
-            ], Response::HTTP_NOT_FOUND);
-        }
-
         if ($client->delete()) {
-
             return response()->json([
                 'success' => true,
                 'message' => 'Клиент успешно удалён',
@@ -63,8 +53,27 @@ class ClientController extends Controller
     {
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Client $client)
     {
+        $validated = $request->validate([
+            'phone_number' => ['required', 'regex:/^8\d{10}$/', (new Unique('clients'))->withoutTrashed()->ignoreModel($client)],
+            'full_name' => 'required'
+        ], [
+            'unique' => 'Пользователь с таким номером телефона уже существует',
+        ]);
+
+        if ($client->update($validated)) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Клиент успешно удалён',
+                'client' => $client
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при удалении клиента',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

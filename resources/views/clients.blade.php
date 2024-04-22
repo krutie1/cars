@@ -40,17 +40,16 @@
                             <td>{{ $client -> created_at}}</td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#clientsModal" data-bs-whatever="@mdo">
+                                        data-bs-target="#clientsModal" data-client="{{ json_encode($client) }}">
                                     Р
                                 </button>
-                                <button onclick="confirmDelete({{ $client -> phone_number}})" id="button-delete"
+                                <button onclick="confirmDelete({{ $client -> id }})" id="button-delete"
                                         type="button" class="btn btn-danger">
                                     У
                                 </button>
                             </td>
                         </tr>
                     @endforeach
-                    <!-- Добавьте другие записи с кнопками редактирования здесь -->
 
                     </tbody>
                 </table>
@@ -68,18 +67,18 @@
                 <div class="modal-body">
                     <form>
                         <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Recipient:</label>
-                            <input type="text" class="form-control" id="recipient-name">
+                            <label for="recipient-name" class="col-form-label">Номер телефона:</label>
+                            <input type="text" class="form-control" id="client-number">
                         </div>
                         <div class="mb-3">
-                            <label for="message-text" class="col-form-label">Message:</label>
-                            <textarea class="form-control" id="message-text"></textarea>
+                            <label for="recipient-name" class="col-form-label">ФИО:</label>
+                            <input type="text" class="form-control" id="client-name">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Send message</button>
+                    <button type="button" class="btn btn-success" id="edit-btn">Сохранить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>

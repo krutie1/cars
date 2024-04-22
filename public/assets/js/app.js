@@ -86,17 +86,14 @@ function createClient() {
                 window.location.reload();
             },
             error: function (xhr, status, error) {
-                alertMessage.saveMessage(data)
-
-                // Check if the error object contains specific fields and their errors
                 if (xhr.responseJSON.errors.hasOwnProperty('full_name')) {
-                    $('#client_name').addClass('is-invalid'); // Add error class to the input field
-                    $('#client-name-error').text(xhr.responseJSON.errors.full_name[0]); // Display error message
+                    $('#client_name').addClass('is-invalid');
+                    $('#client-name-error').text(xhr.responseJSON.errors.full_name[0]);
                 }
 
                 if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
-                    $('#client_number').addClass('is-invalid'); // Add error class to the input field
-                    $('#client-number-error').text(xhr.responseJSON.errors.phone_number[0]); // Display error message
+                    $('#client_number').addClass('is-invalid');
+                    $('#client-number-error').text(xhr.responseJSON.errors.phone_number[0]);
                 }
             }
         });
@@ -108,16 +105,19 @@ function createClientModal() {
         // Button that triggered the modal
         var button = $(event.relatedTarget);
         // Extract info from data-bs-* attributes
-        var recipient = button.data('bs-whatever');
-        // If necessary, you could initiate an AJAX request here
-        // and then do the updating in a callback.
-        //
-        // Update the modal's content.
-        var modalTitle = $('#clientsModal').find('.modal-title');
-        var modalBodyInput = $('#clientsModal').find('.modal-body input');
+        var client = button.data('client');
 
-        modalTitle.text('New message to ' + recipient);
-        modalBodyInput.val(recipient);
+        var modalTitle = $('#clientsModal').find('.modal-title');
+        var clientNumber = $('#clientsModal').find('#client-number');
+        var clientName = $('#clientsModal').find('#client-name');
+
+        modalTitle.text(`Редактирования клиента: ${client.full_name}`);
+        clientNumber.val(client.phone_number);
+        clientName.val(client.full_name);
+
+        $('#edit-btn').on('click', function () {
+            editClient(client.id, {name: clientName.val(), number: clientNumber.val()});
+        });
     });
 }
 
@@ -151,4 +151,18 @@ function deleteClient(id) {
     });
 }
 
+function editClient(id, client) {
+    $.ajax({
+        type: "PUT",
+        url: `/client/${id}`,
+        data: {full_name: client.name, phone_number: client.number},
+        success: function (data) {
+            alertMessage.saveMessage(data)
 
+            window.location.reload();
+        },
+        error: function (xhr, status, error) {
+
+        }
+    });
+}

@@ -19,22 +19,23 @@ use Illuminate\Support\Facades\Route;
 // admin manager
 //Route::get('/', [ClientController::class, 'index'])->name('clients.index');
 
-Route::get('/visits', function() {
+Route::get('/visits', function () {
     return view('visits');
 });
 
 // admin
-Route::get('/managers', function() {
+Route::get('/managers', function () {
     return view('managers');
 });
 
 
-Route::resource('client', ClientController::class);
+//Route::resource('client', ClientController::class);
 // Client Controller Routes
-//Route::prefix('/client')->group(function() {
-//    Route::get('/', [ClientController::class, 'index'])->name('clients.index');
-//    Route::post('/create', [ClientController::class, 'create']);
-//    Route::delete('/{id}', [ClientController::class, 'destroy']);
-//});
+Route::prefix('/client')->group(function () {
+    Route::get('/', [ClientController::class, 'index'])->name('clients.index');
+    Route::post('/create', [ClientController::class, 'create']);
+    Route::delete('/{client}', [ClientController::class, 'destroy']);
+    Route::put('/{client}', [ClientController::class, 'update']);
+});
 
 
