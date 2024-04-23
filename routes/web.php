@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,28 +18,39 @@ use Illuminate\Support\Facades\Route;
 
 // add controllers
 // admin manager
-Route::get('/', function () {
+//Route::get('/', function () {
+//
+//    // middleware
+//    // return view('login');
+//});
+
+
+Route::get('/login', function () {
     return view('login');
-});
+})->name('login');
+
+Route::post('/auth', [UserController::class, 'authenticate'])->name('auth.authenticate');
+
+Route::get('/logout', [UserController::class, 'logout'])->name('auth.logout');
 
 Route::get('/visits', function () {
     return view('visits');
-});
+})->middleware('auth');
 
 // admin
 Route::get('/managers', function () {
     return view('managers');
-});
+})->middleware(['auth', 'admin']);
 
 
 //Route::resource('client', ClientController::class);
 // Client Controller Routes
 Route::prefix('/client')->group(function () {
-    Route::get('/', [ClientController::class, 'index'])->name('clients.index');
-    Route::post('/create', [ClientController::class, 'store']);
-    Route::get('/find-by-phone', [ClientController::class, 'findByPhoneNumber'])->name('client.findByPhone');
-    Route::delete('/{client}', [ClientController::class, 'destroy']);
-    Route::put('/{client}', [ClientController::class, 'update']);
+    Route::get('/', [ClientController::class, 'index'])->name('clients.index')->middleware('auth');
+    Route::post('/create', [ClientController::class, 'store'])->middleware('auth');
+    Route::get('/find-by-phone', [ClientController::class, 'findByPhoneNumber'])->name('client.findByPhone')->middleware('auth');
+    Route::delete('/{client}', [ClientController::class, 'destroy'])->middleware('auth');
+    Route::put('/{client}', [ClientController::class, 'update'])->middleware('auth');
 });
 
 

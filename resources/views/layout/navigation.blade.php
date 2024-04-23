@@ -19,27 +19,29 @@
                 Посещения
             </a>
         </li>
-        <li class="nav-item">
-            <a href="/managers" class="nav-link {{ Request::is('managers*') ? 'active' : 'text-white'}}"
-               aria-current="{{ Request::is('/') ? 'page' : ''}}">
-                <img class="bi me-2" src="{{ asset('assets/imgs/people.svg') }}" alt="managers">
-                Менеджеры
-            </a>
-        </li>
+        @if(auth()->user()->hasRole('admin'))
+            <li class="nav-item">
+                <a href="/managers" class="nav-link {{ Request::is('managers*') ? 'active' : 'text-white'}}"
+                   aria-current="{{ Request::is('/') ? 'page' : ''}}">
+                    <img class="bi me-2" src="{{ asset('assets/imgs/people.svg') }}" alt="managers">
+                    Менеджеры
+                </a>
+            </li>
+        @endif
     </ul>
     <hr>
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
             {{--                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">--}}
-            <strong>[Имя пользователя]</strong>
+            <strong>{{ auth()->user()->name }}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
             {{--                <li><a class="dropdown-item" href="#">New project...</a></li>--}}
             {{--                <li><a class="dropdown-item" href="#">Settings</a></li>--}}
             {{--                <li><a class="dropdown-item" href="#">Profile</a></li>--}}
             {{--                <li><hr class="dropdown-divider"></li>--}}
-            <li><a class="dropdown-item" href="#">Выйти</a></li>
+            <li><a class="dropdown-item" href="{{ route('auth.logout') }}" id="logout-btn">Выйти</a></li>
         </ul>
     </div>
 </div>
@@ -63,12 +65,14 @@
                 <img src="{{ asset('assets/imgs/person-vcard.svg') }}" alt="visits">
             </a>
         </li>
-        <li class="nav-item">
-            <a href="/managers" class="nav-link {{ Request::is('managers*') ? 'active' : 'text-white'}}"
-               aria-current="{{ Request::is('/') ? 'page' : ''}}">
-                <img src="{{ asset('assets/imgs/people.svg') }}" alt="managers">
-            </a>
-        </li>
+        @if(auth()->user()->hasRole('admin'))
+            <li class="nav-item">
+                <a href="/managers" class="nav-link {{ Request::is('managers*') ? 'active' : 'text-white'}}"
+                   aria-current="{{ Request::is('/') ? 'page' : ''}}">
+                    <img src="{{ asset('assets/imgs/people.svg') }}" alt="managers">
+                </a>
+            </li>
+        @endif
     </ul>
     <hr>
     <div class="dropdown">
@@ -82,7 +86,7 @@
             {{--                <li><a class="dropdown-item" href="#">Settings</a></li>--}}
             {{--                <li><a class="dropdown-item" href="#">Profile</a></li>--}}
             {{--                <li><hr class="dropdown-divider"></li>--}}
-            <li><a class="dropdown-item" href="#">Выйти</a></li>
+            <li><a class="dropdown-item" href="{{ route('auth.logout') }}" id="logout-btn">Выйти</a></li>
         </ul>
     </div>
 </div>
