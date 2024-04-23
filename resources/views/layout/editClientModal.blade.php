@@ -11,7 +11,8 @@
                 <form>
                     <div class="mb-3">
                         <label for="edit-client-number" class="col-form-label">Номер телефона:</label>
-                        <input type="text" name="edit-client-number" class="form-control" id="edit-client-number"/>
+                        <input type="number" pattern="[0-9]+" name="edit-client-number" class="form-control"
+                               id="edit-client-number"/>
                         <div id="edit-client-number-error" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">

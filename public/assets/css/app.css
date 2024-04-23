@@ -195,6 +195,21 @@ table tr td:first-child {
     border-top-right-radius: 0;
 }
 
+button .bi {
+    display: flex;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* Optional: Remove margin */
+}
+
+.space-evenly {
+    display: flex;
+    justify-content: space-evenly;
+}
+
 @media (max-width: 768px) {
     .nav-item a {
         justify-content: center;
@@ -203,5 +218,9 @@ table tr td:first-child {
 
     .nav-pills .nav-link {
         border-radius: 0;
+    }
+
+    .dropdown a {
+        justify-content: center;
     }
 }

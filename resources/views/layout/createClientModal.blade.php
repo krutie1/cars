@@ -12,7 +12,8 @@
                 <form id="createClient">
                     <div class="mb-3">
                         <label for="phone_number" class="col-form-label">Введите номер телефона:</label>
-                        <input type="text" name="phone_number" class="form-control" id="client_number"
+                        <input type="number" pattern="[0-9]+" name="phone_number" class="form-control"
+                               id="client_number"
                                autocomplete="off">
                         <div id="client-number-error" class="invalid-feedback"></div>
                     </div>

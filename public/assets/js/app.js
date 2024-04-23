@@ -50,7 +50,9 @@ $(document).ready(function () {
     }
 
     initEditModal();
+
     createClient();
+    createManager();
 
     (function () {
         const message = alertMessage.getMessage()
@@ -60,6 +62,7 @@ $(document).ready(function () {
     })();
 });
 
+// create client
 function createClient() {
     $('#createClient').on('submit', function (e) {
         e.preventDefault();
@@ -79,7 +82,7 @@ function createClient() {
             last_name = $form.find("input[name='last_name']").val(),
             patronymic = $form.find("input[name='patronymic']").val(),
             number = $form.find("input[name='phone_number']").val(),
-            url = "/client/create"
+            url = "/clients/create"
 
         $.ajax({
             type: "POST",
@@ -116,15 +119,58 @@ function createClient() {
     });
 }
 
-function confirmDelete(rowId) {
-    if (confirm("Вы уверены что хотите удалить запись?")) {
-        deleteClient(rowId);
-    }
+// create manager
+function createManager() {
+    $('#createManager').on('submit', function (e) {
+        e.preventDefault();
+
+        $('#manager_name').removeClass('is-invalid');
+        $('#manager-name-error').text('');
+        $('#manager_password').removeClass('is-invalid');
+        $('#manager-password-error').text('');
+        $('#manager_number').removeClass('is-invalid');
+        $('#manager-number-error').text('');
+
+        var $form = $(this),
+            name = $form.find("input[name='name']").val(),
+            number = $form.find("input[name='phone_number']").val(),
+            password = $form.find("input[name='password']").val(),
+            url = "/managers/create"
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {name: name, phone_number: number, password: password},
+            dataType: "json",
+            success: function (data) {
+                alertMessage.saveMessage(data)
+
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                if (xhr.responseJSON.errors.hasOwnProperty('name')) {
+                    $('#manager_name').addClass('is-invalid');
+                    $('#manager-name-error').text(xhr.responseJSON.errors.name[0]);
+                }
+
+                if (xhr.responseJSON.errors.hasOwnProperty('password')) {
+                    $('#manager_password').addClass('is-invalid');
+                    $('#manager-password-error').text(xhr.responseJSON.errors.password[0]);
+                }
+
+                if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
+                    $('#manager_number').addClass('is-invalid');
+                    $('#manager-number-error').text(xhr.responseJSON.errors.phone_number[0]);
+                }
+            }
+        });
+    });
 }
+
 
 function deleteClient(id) {
     $.ajax({
-        url: `/client/${id}`,
+        url: `/clients/${id}`,
         type: 'DELETE',
         responseType: 'json',
         dataType: 'json',
@@ -140,6 +186,12 @@ function deleteClient(id) {
             window.location.reload();
         }
     });
+}
+
+function confirmDelete(rowId) {
+    if (confirm("Вы уверены что хотите удалить запись?")) {
+        deleteClient(rowId);
+    }
 }
 
 function initEditModal() {
@@ -175,7 +227,7 @@ function initEditModal() {
 function editClient(id, client) {
     $.ajax({
         type: "PUT",
-        url: `/client/${id}`,
+        url: `/clients/${id}`,
         data: {
             first_name: client.first_name,
             last_name: client.last_name,

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRolesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -45,8 +46,13 @@ class User extends Authenticatable
         'roles' => 'array'
     ];
 
-    public function hasRole(string $role): bool
+    public function hasRole(UserRolesEnum $role): bool
     {
-        return in_array($role, $this->roles);
+        return in_array($role->value, $this->roles);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(UserRolesEnum::ADMIN);
     }
 }

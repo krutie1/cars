@@ -16,8 +16,13 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+//            $request->session()->put('last_login', now()->subDay()->format('Y-m-d H:i:s'));
+            $request->session()->put('last_login', now()->format('Y-m-d H:i:s'));
 
-            return redirect()->intended('client');
+            file_put_contents('temp.txt', $request->session()->get('last_login') . PHP_EOL, FILE_APPEND);
+
+
+            return redirect('/clients');
         }
 
         return back()->withErrors([

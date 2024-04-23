@@ -45,15 +45,12 @@
                                 <td>{{ $client -> phone_number}}</td>
                                 <td>{{ $client->last_name }} {{ $client->first_name }} {{ $client->patronymic }}</td>
                                 <td>{{ $client -> created_at}}</td>
-                                <td>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#editClientModal" data-client="{{ json_encode($client) }}">
-                                        Р
-                                    </button>
-                                    <button onclick="confirmDelete({{ $client -> id }})" id="button-delete"
-                                            type="button" class="btn btn-danger">
-                                        У
-                                    </button>
+                                <td class="space-evenly">
+                                    <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
+                                       data-bs-target="#editClientModal" data-client="{{ json_encode($client) }}"
+                                       style="cursor: pointer;"></i>
+                                    <i class="bi bi-trash-fill text-danger" onclick="confirmDelete({{ $client->id }})"
+                                       style="cursor: pointer;"></i>
                                 </td>
                             </tr>
                         @endforeach

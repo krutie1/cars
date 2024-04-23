@@ -6,8 +6,8 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="/client" class="nav-link {{ Request::is('client*') ? 'active' : 'text-white'}}"
-               aria-current="{{ Request::is('/client') ? 'page' : ''}}">
+            <a href="/clients" class="nav-link {{ Request::is('clients*') ? 'active' : 'text-white'}}"
+               aria-current="{{ Request::is('/clients') ? 'page' : ''}}">
                 <img class="bi me-2" src="{{ asset('assets/imgs/person.svg') }}" alt="clients">
                 Клиенты
             </a>
@@ -19,7 +19,7 @@
                 Посещения
             </a>
         </li>
-        @if(auth()->user()->hasRole('admin'))
+        @if(auth()->user()->isAdmin())
             <li class="nav-item">
                 <a href="/managers" class="nav-link {{ Request::is('managers*') ? 'active' : 'text-white'}}"
                    aria-current="{{ Request::is('/') ? 'page' : ''}}">
@@ -34,7 +34,7 @@
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
             {{--                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">--}}
-            <strong>{{ auth()->user()->name }}</strong>
+            <strong>{{ auth()->user()-> name }}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
             {{--                <li><a class="dropdown-item" href="#">New project...</a></li>--}}
@@ -54,8 +54,8 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="/client" class="nav-link {{ Request::is('client*') ? 'active' : 'text-white'}}"
-               aria-current="{{ Request::is('/client') ? 'page' : ''}}">
+            <a href="/clients" class="nav-link {{ Request::is('clients*') ? 'active' : 'text-white'}}"
+               aria-current="{{ Request::is('/clients') ? 'page' : ''}}">
                 <img src="{{ asset('assets/imgs/person.svg') }}" alt="clients">
             </a>
         </li>
@@ -65,7 +65,7 @@
                 <img src="{{ asset('assets/imgs/person-vcard.svg') }}" alt="visits">
             </a>
         </li>
-        @if(auth()->user()->hasRole('admin'))
+        @if(auth()->user()->isAdmin())
             <li class="nav-item">
                 <a href="/managers" class="nav-link {{ Request::is('managers*') ? 'active' : 'text-white'}}"
                    aria-current="{{ Request::is('/') ? 'page' : ''}}">
@@ -79,7 +79,7 @@
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
             {{--                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">--}}
-            <strong>[Имя пользователя]</strong>
+            <strong>{{ auth()->user()-> name }}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
             {{--                <li><a class="dropdown-item" href="#">New project...</a></li>--}}

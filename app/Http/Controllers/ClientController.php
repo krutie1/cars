@@ -21,8 +21,7 @@ class ClientController extends Controller
         ]);
 
         $client = Client::create($validated);
-
-
+        
         return response()->json([
             'success' => true,
             'message' => 'Клиент успешно создан',

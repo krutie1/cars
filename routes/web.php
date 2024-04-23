@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,43 +15,46 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-
-// add controllers
-// admin manager
-//Route::get('/', function () {
-//
-//    // middleware
-//    // return view('login');
-//});
-
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('clients.index');
+    } else {
+        return redirect()->route('login');
+    }
+});
 
 Route::get('/login', function () {
-    return view('login');
+    if (auth()->check()) {
+        return redirect()->route('clients.index');
+    } else {
+        return view('login');
+    }
 })->name('login');
 
 Route::post('/auth', [UserController::class, 'authenticate'])->name('auth.authenticate');
 
 Route::get('/logout', [UserController::class, 'logout'])->name('auth.logout');
 
-Route::get('/visits', function () {
-    return view('visits');
-})->middleware('auth');
+// Visits Route
+Route::middleware('auth')->group(function () {
+    Route::get('/visits', function () {
+        return view('visits');
+    });
+});
 
-// admin
-Route::get('/managers', function () {
-    return view('managers');
-})->middleware(['auth', 'admin']);
+// Managers Route
+Route::prefix('/managers')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/', [ManagerController::class, 'index']);
+    Route::post('/create', [ManagerController::class, 'store']);
+});
 
-
-//Route::resource('client', ClientController::class);
-// Client Controller Routes
-Route::prefix('/client')->group(function () {
-    Route::get('/', [ClientController::class, 'index'])->name('clients.index')->middleware('auth');
-    Route::post('/create', [ClientController::class, 'store'])->middleware('auth');
-    Route::get('/find-by-phone', [ClientController::class, 'findByPhoneNumber'])->name('client.findByPhone')->middleware('auth');
-    Route::delete('/{client}', [ClientController::class, 'destroy'])->middleware('auth');
-    Route::put('/{client}', [ClientController::class, 'update'])->middleware('auth');
+// Client Routes
+Route::prefix('/clients')->middleware('auth')->group(function () {
+    Route::get('/', [ClientController::class, 'index'])->name('clients.index');
+    Route::post('/create', [ClientController::class, 'store']);
+    Route::get('/find-by-phone', [ClientController::class, 'findByPhoneNumber'])->name('client.findByPhone');
+    Route::delete('/{client}', [ClientController::class, 'destroy']);
+    Route::put('/{client}', [ClientController::class, 'update']);
 });
 
 
