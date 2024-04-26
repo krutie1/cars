@@ -6,27 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Client extends Model
+class Payment extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'phone_number',
-        'first_name',
-        'last_name',
-        'patronymic'
+        'name',
     ];
-
-    protected $dates = ['deleted_at'];
 
     public function visits()
     {
         return $this->hasMany(Visit::class);
     }
-
-    public function lastVisit()
-    {
-        return $this->hasOne(Visit::class)->whereNull('deleted_at')->latest();
-    }
-
 }

@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,16 +38,30 @@ Route::post('/auth', [UserController::class, 'authenticate'])->name('auth.authen
 Route::get('/logout', [UserController::class, 'logout'])->name('auth.logout');
 
 // Visits Route
-Route::middleware('auth')->group(function () {
-    Route::get('/visits', function () {
-        return view('visits');
-    });
+Route::prefix('/visits')->middleware('auth')->group(function () {
+    Route::get('/', [VisitController::class, 'index']);
+    Route::post('/create', [VisitController::class, 'store']);
+
+    // Route::get('/find-by-phone', [ManagerController::class, 'findByPhoneNumber'])->name('manager.findByPhone');
+    Route::put('/{visit}', [VisitController::class, 'update']);
+    Route::delete('/{visit}', [VisitController::class, 'destroy']);
 });
 
 // Managers Route
 Route::prefix('/managers')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [ManagerController::class, 'index']);
     Route::post('/create', [ManagerController::class, 'store']);
+    Route::get('/find-by-phone', [ManagerController::class, 'findByPhoneNumber'])->name('manager.findByPhone');
+    Route::put('/{manager}', [ManagerController::class, 'update']);
+    Route::delete('/{manager}', [ManagerController::class, 'destroy']);
+});
+
+// Payments Route
+Route::prefix('/payments')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::post('/create', [PaymentController::class, 'store']);
+    Route::put('/{payment}', [PaymentController::class, 'update']);
+    Route::delete('/{payment}', [PaymentController::class, 'destroy']);
 });
 
 // Client Routes

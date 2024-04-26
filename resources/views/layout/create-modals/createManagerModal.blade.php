@@ -1,4 +1,4 @@
-{{--    Create Client Modal--}}
+{{--    Create Manager Modal--}}
 <div class="modal fade" id="createManagerModal" tabindex="-1" aria-labelledby="createManagerModalLabel"
      aria-hidden="true">
     <div class="modal-dialog">

@@ -19,7 +19,7 @@ class UserController extends Controller
 //            $request->session()->put('last_login', now()->subDay()->format('Y-m-d H:i:s'));
             $request->session()->put('last_login', now()->format('Y-m-d H:i:s'));
 
-            file_put_contents('temp.txt', $request->session()->get('last_login') . PHP_EOL, FILE_APPEND);
+//            file_put_contents('temp.txt', $request->session()->get('last_login') . PHP_EOL, FILE_APPEND);
 
 
             return redirect('/clients');

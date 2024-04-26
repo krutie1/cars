@@ -32,7 +32,6 @@ return new class extends Migration {
     public function down(): void
     {
         //
-        User::query()->firstWhere('phone_number', '87471337514')?->delete();
-        User::query()->firstWhere('phone_number', '87713664077')?->delete();
+        User::query()->delete();
     }
 };

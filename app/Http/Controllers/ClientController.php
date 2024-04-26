@@ -21,7 +21,7 @@ class ClientController extends Controller
         ]);
 
         $client = Client::create($validated);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Клиент успешно создан',
@@ -31,7 +31,15 @@ class ClientController extends Controller
 
     public function index(Request $request)
     {
-        $clients = Client::orderBy('id', 'desc')->paginate(12);
+        $clients = Client::with('lastVisit')
+            ->withCount([
+                'visits' => function ($query) {
+                    $query->whereNull('deleted_at');
+                }
+            ])
+            ->orderBy('id', 'desc')
+            ->paginate(12);
+
         return view('clients', compact('clients'));
     }
 
@@ -53,7 +61,7 @@ class ClientController extends Controller
 
     public function show(Request $request, $phone_number)
     {
-        ;
+
     }
 
     public function findByPhoneNumber(Request $request)

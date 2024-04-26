@@ -14,7 +14,7 @@
                 data-bs-target="#createManagerModal">Добавить менеджера
             </button>
 
-            <form method="GET" action="{{ route('client.findByPhone') }}" class="input-group mb-3">
+            <form method="GET" action="{{ route('manager.findByPhone') }}" class="input-group mb-3">
                 <input name="phone_number" id="search-input" type="text" class="form-control"
                        placeholder="Введите номер"
                        aria-label="Введите номер"
@@ -23,10 +23,10 @@
                 <button class="btn btn-outline-secondary" type="submit" id="search-button">Поиск</button>
             </form>
 
-            <h2 class="text-center mb-3">Список Клиентов</h2>
+            <h2 class="text-center mb-3">Список Менеджеров</h2>
             <div class="table-responsive">
                 @if($managers->isEmpty())
-                    <p>Список клиентов пуст.</p>
+                    <p>Список менеджеров пуст.</p>
                 @else
                     <table
                         class="table table-bordered">
@@ -50,11 +50,11 @@
                                 <td>{{ $manager -> created_at}}</td>
                                 <td class="space-evenly">
                                     <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
-                                       data-bs-target="#editManagerModal" data-client="{{ json_encode($manager) }}"
+                                       data-bs-target="#editManagerModal" data-manager="{{ json_encode($manager) }}"
                                        style="cursor: pointer;"></i>
                                     @if(!in_array('admin', $manager -> roles))
                                         <i class="bi bi-trash-fill text-danger"
-                                           onclick="confirmDelete({{ $manager->id }})"
+                                           onclick="confirmDeleteManager({{ $manager->id }})"
                                            style="cursor: pointer;"></i>
                                     @endif
                                 </td>
@@ -63,12 +63,14 @@
 
                         </tbody>
                     </table>
-                    {{ $managers->links('pagination::bootstrap-5') }}
                 @endif
             </div>
+            <br>
+            {{ $managers->links('pagination::bootstrap-5') }}
         </div>
     </div>
 
-    @include('layout.createManagerModal')
+    @include('layout.create-modals.createManagerModal')
+    @include('layout.edit-modals.editManagerModal')
 @endsection
 

@@ -1,7 +1,7 @@
 <div class="main-left  d-none d-md-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
     <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         {{--                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>--}}
-        <span class="fs-4">Cars</span>
+        <img class="bi me-2 logo-img" src="{{ asset('assets/imgs/logo.jpg') }}" alt="Dido Cars">
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
@@ -27,6 +27,13 @@
                     Менеджеры
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="/payments" class="nav-link {{ Request::is('payments*') ? 'active' : 'text-white'}}"
+                   aria-current="{{ Request::is('/') ? 'page' : ''}}">
+                    <img class="bi me-2" src="{{ asset('assets/imgs/cash.svg') }}" alt="cash">
+                    Платежи
+                </a>
+            </li>
         @endif
     </ul>
     <hr>
@@ -49,7 +56,7 @@
 <div class="d-md-none d-flex flex-column flex-shrink-0 bg-dark" style="width: 4.5rem;">
     <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         {{--                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>--}}
-        <span class="fs-4">Cars</span>
+        <img class="bi logo-img" src="{{ asset('assets/imgs/logo.jpg') }}" alt="Dido Cars">
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
@@ -70,6 +77,12 @@
                 <a href="/managers" class="nav-link {{ Request::is('managers*') ? 'active' : 'text-white'}}"
                    aria-current="{{ Request::is('/') ? 'page' : ''}}">
                     <img src="{{ asset('assets/imgs/people.svg') }}" alt="managers">
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/payments" class="nav-link {{ Request::is('payments*') ? 'active' : 'text-white'}}"
+                   aria-current="{{ Request::is('/') ? 'page' : ''}}">
+                    <img src="{{ asset('assets/imgs/cash.svg') }}" alt="cash">
                 </a>
             </li>
         @endif
