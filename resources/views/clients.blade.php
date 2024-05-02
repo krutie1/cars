@@ -8,7 +8,7 @@
         <div class="main-right__content">
             <button
                 type="button"
-                class="btn btn-success mb-3"
+                class="btn btn-primary mb-3"
                 data-bs-toggle="modal"
                 data-bs-target="#createClientModal">Добавить клиента
             </button>
@@ -48,7 +48,7 @@
                                 <td>{{ $client -> last_name }} {{ $client->first_name }} {{ $client->patronymic }}</td>
                                 <td>{{ $client -> created_at}}</td>
                                 <td>
-                                    {{ $client->visits_count ?? 0 }}
+                                    {{ $client -> visits_count ?? 0 }}
                                 </td>
                                 <td>
                                     @if($client->lastVisit)

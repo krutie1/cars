@@ -67,11 +67,15 @@ class ClientController extends Controller
     public function findByPhoneNumber(Request $request)
     {
         $phone_number = $request->input('phone_number');
+        
+        $clientsTrashed = Client::query()->withCount(['visits' => function ($query) {
+            $query->whereNull('deleted_at');
+        }]);
 
         if (empty($phone_number)) {
-            $clients = Client::orderBy('id', 'desc')->paginate(12);
+            $clients = $clientsTrashed->orderBy('id', 'desc')->paginate(12);
         } else {
-            $clients = Client::orderBy('id', 'desc')->where('phone_number', $phone_number)->paginate(12);
+            $clients = $clientsTrashed->where('phone_number', $phone_number)->orderBy('id', 'desc')->paginate(12);
         }
 
         return view('clients', compact('clients'));

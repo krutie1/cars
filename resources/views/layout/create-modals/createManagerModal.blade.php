@@ -33,7 +33,7 @@
             <div id="create-manager-general-error" class="invalid-feedback"></div>
             <br>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-success">Добавить менеджера</button>
+                <button type="submit" class="btn btn-primary">Добавить менеджера</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
             </form>

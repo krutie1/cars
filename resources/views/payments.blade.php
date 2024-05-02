@@ -9,7 +9,7 @@
         <div class="main-right__content">
             <button
                 type="button"
-                class="btn btn-success mb-3"
+                class="btn btn-primary mb-3"
                 data-bs-toggle="modal"
                 data-bs-target="#createPaymentModal">Добавить платёж
             </button>
@@ -30,16 +30,22 @@
                         </thead>
                         <tbody>
                         @foreach($payments as $payment)
-                            <tr>
+                            <tr class="{{ $payment -> deleted_at ? 'bg-danger text-white' : ''}}">
                                 <td>{{ $payment -> id}}</td>
                                 <td>{{ $payment -> name }}</td>
                                 <td class="space-evenly">
-                                    <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
-                                       data-bs-target="#editPaymentModal" data-payment="{{ json_encode($payment) }}"
-                                       style="cursor: pointer;"></i>
-                                    <i class="bi bi-trash-fill text-danger"
-                                       onclick="confirmDeletePayment({{ $payment->id }})"
-                                       style="cursor: pointer;"></i>
+                                    @if($payment->deleted_at)
+                                        <i class="bi bi-arrow-clockwise text-success"
+                                           onclick="restorePayment({{ $payment->id }})"
+                                           style="cursor: pointer;"></i>
+                                    @else
+                                        <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
+                                           data-bs-target="#editPaymentModal" data-payment="{{ json_encode($payment) }}"
+                                           style="cursor: pointer;"></i>
+                                        <i class="bi bi-trash-fill text-danger"
+                                           onclick="confirmDeletePayment({{ $payment->id }})"
+                                           style="cursor: pointer;"></i>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

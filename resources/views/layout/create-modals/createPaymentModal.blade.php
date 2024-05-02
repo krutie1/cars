@@ -18,7 +18,7 @@
                     </div>
                     <br>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Добавить платёж</button>
+                        <button type="submit" class="btn btn-primary">Добавить платёж</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                     </div>
                 </form>

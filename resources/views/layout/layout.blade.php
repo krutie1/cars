@@ -6,6 +6,8 @@
 
     <title>@yield('title', 'Cars')</title>
 
+    <link rel="shortcut icon" href="{{ asset('assets/imgs/logo.jpg') }}" type="image/jpg">
+
     <link href="{{ asset('assets/vendor/fonts-vendor.css') }}" rel="stylesheet"/>
 
     <link rel="stylesheet"

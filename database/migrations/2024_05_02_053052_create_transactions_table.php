@@ -10,14 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('visits', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('clients');
-            $table->timestamp('start_time');
-            $table->timestamp('end_time')->nullable();
-            $table->string('comment');
-            $table->decimal('cost', 10, 0)->default(0);
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('visit_id')->constrained('visits');
+            $table->foreignId('payment_id')->constrained('payments');
+            $table->decimal('amount', 10, 0);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -28,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('visits');
+        Schema::dropIfExists('transactions');
     }
 };

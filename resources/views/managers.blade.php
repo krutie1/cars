@@ -9,15 +9,15 @@
         <div class="main-right__content">
             <button
                 type="button"
-                class="btn btn-success mb-3"
+                class="btn btn-primary mb-3"
                 data-bs-toggle="modal"
                 data-bs-target="#createManagerModal">Добавить менеджера
             </button>
 
             <form method="GET" action="{{ route('manager.findByPhone') }}" class="input-group mb-3">
                 <input name="phone_number" id="search-input" type="text" class="form-control"
-                       placeholder="Введите номер"
-                       aria-label="Введите номер"
+                       placeholder="Введите номер телефона"
+                       aria-label="Введите номер телефона"
                        pattern="8[0-9]{10}"
                        aria-describedby="search-button">
                 <button class="btn btn-outline-secondary" type="submit" id="search-button">Поиск</button>

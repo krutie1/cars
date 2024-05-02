@@ -27,13 +27,13 @@
                     Менеджеры
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="/payments" class="nav-link {{ Request::is('payments*') ? 'active' : 'text-white'}}"
-                   aria-current="{{ Request::is('/') ? 'page' : ''}}">
-                    <img class="bi me-2" src="{{ asset('assets/imgs/cash.svg') }}" alt="cash">
-                    Платежи
-                </a>
-            </li>
+            {{--            <li class="nav-item">--}}
+            {{--                <a href="/payments" class="nav-link {{ Request::is('payments*') ? 'active' : 'text-white'}}"--}}
+            {{--                   aria-current="{{ Request::is('/') ? 'page' : ''}}">--}}
+            {{--                    <img class="bi me-2" src="{{ asset('assets/imgs/cash.svg') }}" alt="cash">--}}
+            {{--                    Платежи--}}
+            {{--                </a>--}}
+            {{--            </li>--}}
         @endif
     </ul>
     <hr>
@@ -45,9 +45,13 @@
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
             {{--                <li><a class="dropdown-item" href="#">New project...</a></li>--}}
-            {{--                <li><a class="dropdown-item" href="#">Settings</a></li>--}}
-            {{--                <li><a class="dropdown-item" href="#">Profile</a></li>--}}
-            {{--                <li><hr class="dropdown-divider"></li>--}}
+            @if(auth()->user()->isAdmin())
+                <li><a class="dropdown-item" href="/payments">Платежи</a></li>
+                <li><a class="dropdown-item" href="/prices">Тариф</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+            @endif
             <li><a class="dropdown-item" href="{{ route('auth.logout') }}" id="logout-btn">Выйти</a></li>
         </ul>
     </div>
@@ -79,12 +83,12 @@
                     <img src="{{ asset('assets/imgs/people.svg') }}" alt="managers">
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="/payments" class="nav-link {{ Request::is('payments*') ? 'active' : 'text-white'}}"
-                   aria-current="{{ Request::is('/') ? 'page' : ''}}">
-                    <img src="{{ asset('assets/imgs/cash.svg') }}" alt="cash">
-                </a>
-            </li>
+            {{--            <li class="nav-item">--}}
+            {{--                <a href="/payments" class="nav-link {{ Request::is('payments*') ? 'active' : 'text-white'}}"--}}
+            {{--                   aria-current="{{ Request::is('/') ? 'page' : ''}}">--}}
+            {{--                    <img src="{{ asset('assets/imgs/cash.svg') }}" alt="cash">--}}
+            {{--                </a>--}}
+            {{--            </li>--}}
         @endif
     </ul>
     <hr>
@@ -95,10 +99,13 @@
             <strong>{{ auth()->user()-> name }}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-            {{--                <li><a class="dropdown-item" href="#">New project...</a></li>--}}
-            {{--                <li><a class="dropdown-item" href="#">Settings</a></li>--}}
-            {{--                <li><a class="dropdown-item" href="#">Profile</a></li>--}}
-            {{--                <li><hr class="dropdown-divider"></li>--}}
+            @if(auth()->user()->isAdmin())
+                <li><a class="dropdown-item" href="/payments">Платежи</a></li>
+                <li><a class="dropdown-item" href="/prices">Тариф</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+            @endif
             <li><a class="dropdown-item" href="{{ route('auth.logout') }}" id="logout-btn">Выйти</a></li>
         </ul>
     </div>

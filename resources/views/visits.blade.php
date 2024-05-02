@@ -7,21 +7,58 @@
 
     <div class="main-right d-flex flex-column p-3">
         <div class="main-right__content">
-            <button
-                type="button"
-                class="btn btn-success mb-3"
-                data-bs-toggle="modal"
-                data-bs-target="#createVisitModal">Новое посещение
-            </button>
+            @if(!auth()->user()->isAdmin())
+                <button
+                    type="button"
+                    class="btn btn-primary mb-3"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createVisitModal">Новое посещение
+                </button>
+            @endif
 
-            <form method="GET" action="{{ route('client.findByPhone') }}" class="input-group mb-3">
+            <form method="GET" action="{{ route('visit.findByPhone') }}" class="input-group mb-3">
                 <input name="phone_number" id="search-input" type="text" class="form-control"
-                       placeholder="Введите номер"
-                       aria-label="Введите номер"
+                       placeholder="Введите номер телефона"
+                       aria-label="Введите номер телефона"
                        pattern="8[0-9]{10}"
                        aria-describedby="search-button">
-                <button class="btn btn-outline-secondary" type="submit" id="search-button">Поиск</button>
+                <button class="btn btn-outline-secondary" type="submit">Поиск</button>
             </form>
+
+            @if(auth()->user()->isAdmin())
+                <form method="GET" action="/filter">
+                    <div class="row pb-3 justify-content-end">
+                        <div class="col-lg-2 col-md-3 col-sm-6 align-self-end">
+                            <button
+                                type="button"
+                                class="btn btn-primary w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createVisitModal">Новое посещение
+                            </button>
+                        </div>
+                        <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0 ">
+                            <label for="start">Начало даты</label>
+                            <input type="date" name="start" class="form-control"/>
+                        </div>
+                        <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
+                            <label for="end">Конец даты</label>
+                            <input type="date" name="end" class="form-control"/>
+                        </div>
+                        {{--                        <div class="col-lg-2 col-md-3 col-sm-6 pt-2 pt-md-0">--}}
+                        {{--                            <label for="status">Статус</label>--}}
+                        {{--                            <select name="status" class="form-control">--}}
+                        {{--                                <option value="not_deleted" selected>Не удаленные</option>--}}
+                        {{--                                <option value="deleted">Удаленные</option>--}}
+                        {{--                                <option value="all">Все</option>--}}
+                        {{--                            </select>--}}
+                        {{--                        </div>--}}
+                        <div class="col-lg-2 col-md-3 col-sm-6 align-self-end">
+                            <button type="submit" class="btn btn-primary  w-100">Фильтр</button>
+                        </div>
+                    </div>
+                </form>
+
+            @endif
 
             <h2 class="text-center mb-3">Список Посещений</h2>
             <div class="table-responsive">
@@ -39,19 +76,21 @@
                             <th>Время начала</th>
                             <th>Время завершения</th>
                             <th>Общая стоимость</th>
-                            {{--                            <th>Тип платежа</th>--}}
-                            {{--                            @foreach($payments as $payment)--}}
-                            {{--                                <th>{{ $payment->name }}</th>--}}
-                            {{--                            @endforeach--}}
                             <th>Оплачено</th>
+                            @if(auth()->user()->isAdmin())
+                                <th>Дата создания</th>
+                                <th>Телефон менеджера</th>
+                            @endif
                             <th class="small-table-column">Действия</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($visits as $visit)
-                            <tr>
+                            <tr class="{{ $visit -> deleted_at ? 'bg-danger text-white' : ''}}">
                                 <td>{{ $visit -> id }}</td>
-                                <td>{{ $visit -> clientTrashed -> phone_number }}</td>
+                                <td class="{{ $visit -> clientTrashed -> deleted_at ? 'bg-danger text-white' : ''}}">
+                                    {{ $visit -> clientTrashed -> phone_number }}
+                                </td>
                                 <td class="{{ $visit -> clientTrashed -> deleted_at ? 'bg-danger text-white' : ''}}">
                                     {{ $visit -> clientTrashed -> last_name }}
                                     {{ $visit -> clientTrashed -> first_name }}
@@ -59,20 +98,24 @@
                                 </td>
                                 <td>{{ $visit -> comment }}</td>
                                 <td>{{ $visit -> start_time -> format('H:i') }}</td>
-                                <td>{{ $visit -> end_time -> format('H:i')  }}</td>
+                                <td>{{ $visit -> end_time ? $visit -> end_time -> format('H:i') : '--:--'}}</td>
                                 <td>{{ $visit -> cost }}</td>
-                                {{--                                @foreach($payments as $payment)--}}
-                                {{--                                    <th>-</th>--}}
-                                {{--                                @endforeach--}}
-                                <td>{{ $visit -> paymentsTrashed -> name }}</td>
+                                <td>{!! $visit->totalPayments  !!}</td>
+                                @if(auth()->user()->isAdmin())
+                                    <td>{{ $visit -> created_at }}</td>
+                                    <td>{{ $visit -> userTrashed -> phone_number }}</td>
+                                @endif
                                 <td class="space-evenly">
                                     <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
                                        data-bs-target="#editManagerModal" data-client=""
                                        style="cursor: pointer;"></i>
 
-                                    <i class="bi bi-trash-fill text-danger"
-                                       onclick="confirmDeleteVisit({{ $visit -> id }})"
-                                       style="cursor: pointer;"></i>
+                                    @if(!$visit -> deleted_at)
+                                        <i class="bi bi-trash-fill text-danger"
+                                           onclick="confirmDeleteVisit({{ $visit -> id }})"
+                                           style="cursor: pointer;"></i>
+                                    @endif
+
                                 </td>
                             </tr>
 

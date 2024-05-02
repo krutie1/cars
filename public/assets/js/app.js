@@ -72,14 +72,14 @@ function createClient() {
     $('#createClient').on('submit', function (e) {
         e.preventDefault();
 
-        $('#client_firstname').removeClass('is-invalid');
-        $('#first-name-error').text('');
-        $('#client_lastname').removeClass('is-invalid');
-        $('#last-name-error').text('');
-        $('#client_patronymic').removeClass('is-invalid');
-        $('#patronymic-error').text('');
-        $('#client_number').removeClass('is-invalid');
-        $('#client-number-error').text('');
+        $('#create-first_name').removeClass('is-invalid');
+        $('#client-first_name-error').text('');
+        $('#create-last_name').removeClass('is-invalid');
+        $('#client-last_name-error').text('');
+        $('#create-patronymic').removeClass('is-invalid');
+        $('#client-patronymic-error').text('');
+        $('#create-phone_number').removeClass('is-invalid');
+        $('#client-phone_number-error').text('');
 
 
         var $form = $(this),
@@ -101,23 +101,23 @@ function createClient() {
             },
             error: function (xhr, status, error) {
                 if (xhr.responseJSON.errors.hasOwnProperty('first_name')) {
-                    $('#client_firstname').addClass('is-invalid');
-                    $('#first-name-error').text(xhr.responseJSON.errors.first_name[0]);
+                    $('#create-first_name').addClass('is-invalid');
+                    $('#client-first_name-error').text(xhr.responseJSON.errors.first_name[0]);
                 }
 
                 if (xhr.responseJSON.errors.hasOwnProperty('last_name')) {
-                    $('#client_lastname').addClass('is-invalid');
-                    $('#last-name-error').text(xhr.responseJSON.errors.last_name[0]);
+                    $('#create-last_name').addClass('is-invalid');
+                    $('#client-last_name-error').text(xhr.responseJSON.errors.last_name[0]);
                 }
 
                 if (xhr.responseJSON.errors.hasOwnProperty('patronymic')) {
-                    $('#client_patronymic').addClass('is-invalid');
-                    $('#patronymic-error').text(xhr.responseJSON.errors.patronymic[0]);
+                    $('#create-patronymic').addClass('is-invalid');
+                    $('#client-patronymic-error').text(xhr.responseJSON.errors.patronymic[0]);
                 }
 
                 if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
-                    $('#client_number').addClass('is-invalid');
-                    $('#client-number-error').text(xhr.responseJSON.errors.phone_number[0]);
+                    $('#create-phone_number').addClass('is-invalid');
+                    $('#client-phone_number-error').text(xhr.responseJSON.errors.phone_number[0]);
                 }
             }
         });
@@ -174,8 +174,22 @@ function createManager() {
 
 // create createVisit
 function createVisit() {
+    $('#addPaymentField').click(function () {
+        var paymentField = $('#payment_fields .payment-field').first().clone();
+        paymentField.find('select').val('');
+        paymentField.find('.amount').val('');
+        paymentField.appendTo('#payment_fields');
+    });
+
+    $('#removePayment').click(function () {
+        $('#payment_fields .payment-field:last').remove();
+    });
+
     $('#createVisit').on('submit', function (e) {
         e.preventDefault();
+
+        var payments = []; // Initialize payments as an array
+        var amounts = [];
 
         var $form = $(this),
             client_id = $form.find("input[name='client_id']").val(),
@@ -185,7 +199,17 @@ function createVisit() {
             cost = $form.find("input[name='cost']").val(),
             payment_id = $form.find("input[name='payment_id']").val(),
             user_id = $form.find("input[name='user_id']").val(),
-            url = "/visits/create"
+            url = "/visits/create";
+
+        $('.payment-field').each(function () {
+            var paymentType = $(this).find('select').val();
+            var amount = $(this).find('.amount').val();
+
+            if (paymentType && amount) {
+                payments.push(paymentType); // Push paymentType into payments array
+                amounts.push(amount); // Push amount into amounts array
+            }
+        });
 
         $.ajax({
             type: "POST",
@@ -198,18 +222,21 @@ function createVisit() {
                 cost: cost,
                 payment_id: payment_id,
                 user_id: user_id,
+                payment_types: payments,
+                payment_amounts: amounts,
             },
             dataType: "json",
             success: function (data) {
-                alertMessage.saveMessage(data)
-
+                alertMessage.saveMessage(data);
                 window.location.reload();
             },
             error: function (xhr, status, error) {
-
+                console.error(xhr.responseText);
+                // Handle errors
             }
         });
     });
+
 }
 
 // create createPayment
@@ -269,6 +296,26 @@ function confirmDeleteVisit(rowId) {
     if (confirm("Вы уверены что хотите удалить запись?")) {
         deleteVisit(rowId);
     }
+}
+
+function restorePayment(id) {
+    $.ajax({
+        url: `/payments/${id}/restore`,
+        type: 'POST',
+        responseType: 'json',
+        dataType: 'json',
+        success: function (data) {
+            alertMessage.saveMessage(data)
+            window.location.reload();
+        },
+        error: function (xhr, status, error) {
+            alertMessage.saveMessage({
+                success: false,
+                message: xhr.responseJSON.message,
+            });
+            window.location.reload();
+        }
+    });
 }
 
 // DELETE FUNCTIONS
@@ -433,6 +480,18 @@ function initEditManagerModal() {
 
 // edit client
 function editClient(id, client) {
+    $('#edit-client-firstname').removeClass('is-invalid');
+    $('#edit-first-name-error').text('');
+
+    $('#edit-client-lastname').removeClass('is-invalid');
+    $('#edit-last-name-error').text('');
+
+    $('#edit-client-patronymic').removeClass('is-invalid');
+    $('#edit-patronymic-error').text('');
+
+    $('#edit-client-number').removeClass('is-invalid');
+    $('#edit-client-number-error').text('');
+
     $.ajax({
         type: "PUT",
         url: `/clients/${id}`,
@@ -515,7 +574,7 @@ function editManager(id, manager) {
 
             if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
                 $('#edit-manager-number').addClass('is-invalid');
-                $('#edit-manager-number-error').text(xhr.responseJSON.errors.phone_number[0]);
+                $('#edit-manager-phone_number-error').text(xhr.responseJSON.errors.phone_number[0]);
             }
         }
     });

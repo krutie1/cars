@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Visit extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'client_id',
@@ -29,6 +30,11 @@ class Visit extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function userTrashed()
+    {
+        return $this->user()->withTrashed();
+    }
+
     public function client()
     {
         return $this->belongsTo(Client::class);
@@ -47,5 +53,10 @@ class Visit extends Model
     public function paymentsTrashed()
     {
         return $this->payment()->withTrashed();
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

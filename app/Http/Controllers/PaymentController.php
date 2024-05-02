@@ -10,7 +10,7 @@ class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $payments = Payment::whereNull('deleted_at')->orderBy('id', 'desc')->paginate(12);
+        $payments = Payment::query()->withTrashed()->orderBy('id', 'desc')->paginate(12);
         return view('payments', compact('payments'));
     }
 
@@ -50,6 +50,25 @@ class PaymentController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function restore($id)
+    {
+        $payment = Payment::onlyTrashed()->findOrFail($id);
+
+        if ($payment->restore()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Платёж успешно добавлен',
+                'payment' => $payment,
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при сохранении платежа',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     public function destroy(Request $request, Payment $payment)
     {

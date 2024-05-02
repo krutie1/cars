@@ -13,18 +13,18 @@
                         <label for="edit-manager-number" class="col-form-label">Номер телефона:</label>
                         <input type="number" pattern="[0-9]+" name="phone_number" class="form-control"
                                id="edit-manager-number"/>
-                        <div id="manager-phone_number-error" class="invalid-feedback"></div>
+                        <div id="edit-manager-phone_number-error" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
                         <label for="edit-manager-name" class="col-form-label">ФИО:</label>
                         <input type="text" name="manager-name" class="form-control"
                                id="edit-manager-name"/>
-                        <div id="manager-name-error" class="invalid-feedback"></div>
+                        <div id="edit-manager-name-error" class="invalid-feedback"></div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="edit-btn">Сохранить</button>
+                <button type="button" class="btn btn-primary" id="edit-btn">Сохранить</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>

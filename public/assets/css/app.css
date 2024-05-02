@@ -9,7 +9,6 @@ body {
     height: 100%;
 }
 
-
 /**, *:before, *:after {*/
 /*    -moz-box-sizing: border-box;*/
 /*    -webkit-box-sizing: border-box;*/
@@ -144,6 +143,11 @@ table tr td:first-child {
     text-align: center;
 }
 
+.table > :not(caption) > * > * {
+    background: transparent;
+    color: inherit;
+}
+
 /*
     login
 */
@@ -219,6 +223,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .table .space-evenly {
     text-align: center;
+    background: white;
 }
 
 .table .space-evenly i:nth-child(1) {

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PriceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
@@ -42,7 +43,8 @@ Route::prefix('/visits')->middleware('auth')->group(function () {
     Route::get('/', [VisitController::class, 'index']);
     Route::post('/create', [VisitController::class, 'store']);
 
-    // Route::get('/find-by-phone', [ManagerController::class, 'findByPhoneNumber'])->name('manager.findByPhone');
+    Route::get('/filter', [VisitController::class, 'filter'])->name('visit.filter');
+    Route::get('/find-by-phone', [VisitController::class, 'findByPhoneNumber'])->name('visit.findByPhone');
     Route::put('/{visit}', [VisitController::class, 'update']);
     Route::delete('/{visit}', [VisitController::class, 'destroy']);
 });
@@ -62,6 +64,7 @@ Route::prefix('/payments')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/create', [PaymentController::class, 'store']);
     Route::put('/{payment}', [PaymentController::class, 'update']);
     Route::delete('/{payment}', [PaymentController::class, 'destroy']);
+    Route::post('/{id}/restore', [PaymentController::class, 'restore'])->name('payments.restore');
 });
 
 // Client Routes
@@ -72,5 +75,12 @@ Route::prefix('/clients')->middleware('auth')->group(function () {
     Route::delete('/{client}', [ClientController::class, 'destroy']);
     Route::put('/{client}', [ClientController::class, 'update']);
 });
+
+// Prices Routes
+Route::prefix('/prices')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/', [PriceController::class, 'index'])->name('prices.page-import');
+    Route::post('/', [PriceController::class, 'index'])->name('prices.import');
+});
+
 
 
