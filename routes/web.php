@@ -46,6 +46,7 @@ Route::prefix('/visits')->middleware('auth')->group(function () {
     Route::get('/filter', [VisitController::class, 'filter'])->name('visit.filter');
     Route::get('/find-by-phone', [VisitController::class, 'findByPhoneNumber'])->name('visit.findByPhone');
     Route::put('/{visit}', [VisitController::class, 'update']);
+    Route::put('/payment/{visit}', [VisitController::class, 'setPayment']);
     Route::delete('/{visit}', [VisitController::class, 'destroy']);
 });
 
@@ -72,6 +73,7 @@ Route::prefix('/clients')->middleware('auth')->group(function () {
     Route::get('/', [ClientController::class, 'index'])->name('clients.index');
     Route::post('/create', [ClientController::class, 'store']);
     Route::get('/find-by-phone', [ClientController::class, 'findByPhoneNumber'])->name('client.findByPhone');
+    Route::get('/search-client', [ClientController::class, 'searchClient'])->name('client.searchClient');
     Route::delete('/{client}', [ClientController::class, 'destroy']);
     Route::put('/{client}', [ClientController::class, 'update']);
 });

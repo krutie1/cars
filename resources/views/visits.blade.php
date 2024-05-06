@@ -26,7 +26,7 @@
             </form>
 
             @if(auth()->user()->isAdmin())
-                <form method="GET" action="/filter">
+                <form method="GET" action="{{ route('visit.filter') }}">
                     <div class="row pb-3 justify-content-end">
                         <div class="col-lg-2 col-md-3 col-sm-6 align-self-end">
                             <button
@@ -76,6 +76,7 @@
                             <th>Время начала</th>
                             <th>Время завершения</th>
                             <th>Общая стоимость</th>
+                            <th>Скидка</th>
                             <th>Оплачено</th>
                             @if(auth()->user()->isAdmin())
                                 <th>Дата создания</th>
@@ -100,18 +101,27 @@
                                 <td>{{ $visit -> start_time -> format('H:i') }}</td>
                                 <td>{{ $visit -> end_time ? $visit -> end_time -> format('H:i') : '--:--'}}</td>
                                 <td>{{ $visit -> cost }}</td>
-                                <td>{!! $visit->totalPayments  !!}</td>
+                                <td>{{ $visit -> discount }}%</td>
+                                <td>{!! $visit -> totalPayments  !!}</td>
                                 @if(auth()->user()->isAdmin())
-                                    <td>{{ $visit -> created_at }}</td>
+                                    <td>{{ $visit->created_at->format('d-m-Y H:i') }}</td>
                                     <td>{{ $visit -> userTrashed -> phone_number }}</td>
                                 @endif
-                                <td class="space-evenly">
-                                    <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
-                                       data-bs-target="#editManagerModal" data-client=""
+                                <td class="space-around">
+                                    <i title="Время завершения" class="bi bi-stopwatch-fill text-primary"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#editVisitModal" data-visit="{{ $visit }}"
                                        style="cursor: pointer;"></i>
 
-                                    @if(!$visit -> deleted_at)
-                                        <i class="bi bi-trash-fill text-danger"
+                                    @if($visit -> end_time)
+                                        <i title="Оплата" class="bi bi-credit-card-fill text-success"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#editVisitPaymentModal" data-visit="{{ $visit }}"
+                                           style="cursor: pointer;"></i>
+                                    @endif
+
+                                    @if(!$visit -> deleted_at && !$visit -> payment_date)
+                                        <i title="Удалить" class="bi bi-trash-fill text-danger"
                                            onclick="confirmDeleteVisit({{ $visit -> id }})"
                                            style="cursor: pointer;"></i>
                                     @endif
@@ -126,9 +136,17 @@
             </div>
             <br>
             {{ $visits->links('pagination::bootstrap-5') }}
+
+            @if(request()->has('error'))
+                <div class="alert alert-danger" role="alert">
+                    {{ request('error') }}
+                </div>
+            @endif
         </div>
     </div>
 
     @include('layout.create-modals.createVisitModal')
+    @include('layout.edit-modals.editVisitModal')
+    @include('layout.edit-modals.editVisitPaymentModal')
 @endsection
 

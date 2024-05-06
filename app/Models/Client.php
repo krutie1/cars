@@ -14,7 +14,8 @@ class Client extends Model
         'phone_number',
         'first_name',
         'last_name',
-        'patronymic'
+        'patronymic',
+        'visits_count'
     ];
 
     protected $dates = ['deleted_at'];

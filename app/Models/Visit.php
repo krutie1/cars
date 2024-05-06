@@ -16,13 +16,14 @@ class Visit extends Model
         'start_time',
         'end_time',
         'cost',
-        'payment_id',
-        'user_id'
+        'user_id',
+        'payment_date'
     ];
 
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        'payment_date' => 'datetime',
     ];
 
     public function user()
@@ -47,7 +48,7 @@ class Visit extends Model
 
     public function payment()
     {
-        return $this->belongsTo(Payment::class);
+        return $this->belongsToMany(Payment::class, 'transactions');
     }
 
     public function paymentsTrashed()

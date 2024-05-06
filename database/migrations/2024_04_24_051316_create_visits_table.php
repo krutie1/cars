@@ -17,7 +17,9 @@ return new class extends Migration {
             $table->timestamp('end_time')->nullable();
             $table->string('comment');
             $table->decimal('cost', 10, 0)->default(0);
+            $table->decimal('discount', 10, 0)->default(0);
             $table->foreignId('user_id')->constrained('users');
+            $table->timestamp('payment_date')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

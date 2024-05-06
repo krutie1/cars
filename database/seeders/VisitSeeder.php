@@ -26,9 +26,7 @@ class VisitSeeder extends Seeder
                 $endTime = $faker->dateTimeBetween($startTime, '+7 days');
                 $comment = $faker->sentence;
                 $cost = $faker->randomNumber(4) * 100; // Random cost between 0 and 9999
-                
 
-                $paymentId = $faker->numberBetween(1, 3); // Assuming you have payment IDs from 1 to 10
                 $userId = $faker->numberBetween(1, 2); // Assuming you have user IDs from 1 to 20
 
                 // Create a new visit
@@ -38,7 +36,6 @@ class VisitSeeder extends Seeder
                     'end_time' => $endTime,
                     'comment' => $comment,
                     'cost' => $cost,
-                    'payment_id' => $paymentId,
                     'user_id' => $userId,
                 ]);
             }

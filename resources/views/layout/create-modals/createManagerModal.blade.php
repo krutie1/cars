@@ -25,19 +25,24 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="col-form-label">Пароль:</label>
-                        <input type="password" name="password" class="form-control" id="manager_password"
-                               autocomplete="new-password">
-                        <div id="manager-password-error" class="invalid-feedback"></div>
+                        <div class="input-group">
+                            <input type="text" name="password" class="manager_password form-control"
+                                   id="manager_password"
+                                   autocomplete="new-password">
+                            <button type="button" class="btn btn-outline-secondary generate_password_btn">
+                                Сгенерировать
+                            </button>
+                            <div id="manager-password-error" class="invalid-feedback"></div>
+                        </div>
                     </div>
+                    <div id="create-manager-general-error" class="invalid-feedback"></div>
+                    <br>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Добавить менеджера</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    </div>
+                </form>
             </div>
-            <div id="create-manager-general-error" class="invalid-feedback"></div>
-            <br>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Добавить менеджера</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-            </div>
-            </form>
         </div>
     </div>
-</div>
 </div>

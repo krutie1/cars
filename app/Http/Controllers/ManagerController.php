@@ -42,7 +42,8 @@ class ManagerController extends Controller
     {
         $validated = $request->validate([
             'phone_number' => ['required', 'regex:/^8\d{10}$/', (new Unique('users'))->withoutTrashed()->ignoreModel($manager)],
-            'name' => 'required'
+            'name' => 'required',
+            'password' => 'required'
         ]);
 
         if ($manager->update($validated)) {

@@ -41,7 +41,7 @@ $(document).ready(function () {
         "onclick": null,
         "showDuration": "200",
         "hideDuration": "1000",
-        "timeOut": "2000",
+        "timeOut": "4000",
         "extendedTimeOut": "1000",
         "showEasing": "swing",
         "hideEasing": "linear",
@@ -49,9 +49,17 @@ $(document).ready(function () {
         "hideMethod": "fadeOut"
     }
 
+    $('.generate_password_btn').click(function () {
+        const length = 6; // You can change the length of the generated password here
+        const generatedPassword = generatePassword(length);
+        $(this).siblings('.manager_password').val(generatedPassword);
+    });
+
     initEditModal();
     initEditPaymentModal();
     initEditManagerModal();
+    initVisitPaymentModal();
+    initVisitModal();
 
     createClient();
     createManager();
@@ -157,15 +165,14 @@ function createManager() {
                     $('#manager_name').addClass('is-invalid');
                     $('#manager-name-error').text(xhr.responseJSON.errors.name[0]);
                 }
+                if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
 
+                    $('#manager_number').addClass('is-invalid');
+                    $('#manager-number-error').text(xhr.responseJSON.errors.phone_number[0]);
+                }
                 if (xhr.responseJSON.errors.hasOwnProperty('password')) {
                     $('#manager_password').addClass('is-invalid');
                     $('#manager-password-error').text(xhr.responseJSON.errors.password[0]);
-                }
-
-                if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
-                    $('#manager_number').addClass('is-invalid');
-                    $('#manager-number-error').text(xhr.responseJSON.errors.phone_number[0]);
                 }
             }
         });
@@ -174,65 +181,94 @@ function createManager() {
 
 // create createVisit
 function createVisit() {
-    $('#addPaymentField').click(function () {
-        var paymentField = $('#payment_fields .payment-field').first().clone();
-        paymentField.find('select').val('');
-        paymentField.find('.amount').val('');
-        paymentField.appendTo('#payment_fields');
+    $('#searchClient').on('input', function () {
+        var query = $(this).val();
+        if (query.length > 3) { // Minimum characters to trigger search
+            $.ajax({
+                url: '/clients/search-client',
+                type: 'GET',
+                data: {query: query},
+                success: function (response) {
+                    $('#searchResults').html('');
+                    if (response.success && response.clients.length > 0) {
+                        response.clients.forEach(function (client) {
+                            var clientHtml =
+                                `<div class="client-item card w-50 mt-3 mb-3 client-card" data-client=${JSON.stringify(client)} data-client-id="${client.id}">
+                                    <div class="card-body">
+                                        <span class="card-title">ФИО: ${client.first_name} ${client.last_name} ${client.patronymic ?? ''}</span><br>
+                                        <span class="body">Номер: ${client.phone_number}</span>
+                                    </div>
+                                </div>`;
+                            $('#searchResults').append(clientHtml);
+                        });
+                    } else {
+                        $('#searchResults').html('<div class="text-muted mt-3">Номер телефона не найден.</div>');
+                    }
+                }
+            });
+        } else {
+            $('#searchResults').html('');
+        }
     });
 
-    $('#removePayment').click(function () {
-        $('#payment_fields .payment-field:last').remove();
+    $(document).on('click', '.client-item', function () {
+        var clientId = $(this).data('client-id');
+        var client = $(this).data('client');
+
+        $('#searchClient').val(`${client.last_name} ${client.first_name} ${client.patronymic ?? ''} | ${client.phone_number}`);
+        $('#searchResults').html('');
+
+        $('#client_id_input').val(clientId);
     });
 
     $('#createVisit').on('submit', function (e) {
         e.preventDefault();
 
-        var payments = []; // Initialize payments as an array
-        var amounts = [];
+        $('#searchClient').removeClass('is-invalid');
+        $('#visit-id-error').text('');
+        $('#start_time_hour').removeClass('is-invalid');
+        $('#visit-start-error').text('');
+        $('#comment').removeClass('is-invalid');
+        $('#visit-comment-error').text('');
+
 
         var $form = $(this),
             client_id = $form.find("input[name='client_id']").val(),
             start_time = $form.find("input[name='start_time_hour']").val(),
-            end_time = $form.find("input[name='end_time_hour']").val(),
             comment = $form.find("input[name='comment']").val(),
             cost = $form.find("input[name='cost']").val(),
-            payment_id = $form.find("input[name='payment_id']").val(),
             user_id = $form.find("input[name='user_id']").val(),
             url = "/visits/create";
-
-        $('.payment-field').each(function () {
-            var paymentType = $(this).find('select').val();
-            var amount = $(this).find('.amount').val();
-
-            if (paymentType && amount) {
-                payments.push(paymentType); // Push paymentType into payments array
-                amounts.push(amount); // Push amount into amounts array
-            }
-        });
 
         $.ajax({
             type: "POST",
             url: url,
             data: {
                 client_id: client_id,
-                start_time_hour: start_time,
-                end_time_hour: end_time,
+                start_time: start_time,
                 comment: comment,
                 cost: cost,
-                payment_id: payment_id,
                 user_id: user_id,
-                payment_types: payments,
-                payment_amounts: amounts,
+
             },
-            dataType: "json",
             success: function (data) {
                 alertMessage.saveMessage(data);
+
                 window.location.reload();
             },
             error: function (xhr, status, error) {
-                console.error(xhr.responseText);
-                // Handle errors
+                if (xhr.responseJSON.errors.hasOwnProperty('client_id')) {
+                    $('#searchClient').addClass('is-invalid');
+                    $('#visit-id-error').text(xhr.responseJSON.errors.client_id[0]);
+                }
+                if (xhr.responseJSON.errors.hasOwnProperty('comment')) {
+                    $('#comment').addClass('is-invalid');
+                    $('#visit-comment-error').text(xhr.responseJSON.errors.comment[0]);
+                }
+                if (xhr.responseJSON.errors.hasOwnProperty('payment_amounts')) {
+                    $('#amount').addClass('is-invalid');
+                    $('#visit-amount-error').text(xhr.responseJSON.errors.payment_types[0]);
+                }
             }
         });
     });
@@ -399,6 +435,22 @@ function deleteVisit(id) {
     });
 }
 
+function generatePassword(length) {
+    const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numericChars = '0123456789';
+    // const specialChars = '!@#$%^&*()-=_+[]{}|;:,.<>?';
+    // const specialChars = '!@#$%^&*()-=_+[]{}|;:,.<>?';
+    const allChars = lowercaseChars + uppercaseChars + numericChars;
+
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * allChars.length);
+        password += allChars[randomIndex];
+    }
+    return password;
+}
+
 // EDIT FUNCTIONS
 function initEditModal() {
     $('#editClientModal').on('show.bs.modal', function (event) {
@@ -437,8 +489,6 @@ function initEditPaymentModal() {
         // Extract info from data-bs-* attributes
         var payment = button.data('payment');
 
-        console.log(payment)
-
         var modalTitle = $('#editPaymentModal').find('.modal-title');
         var paymentName = $('#editPaymentModal').find('#edit-payment-name');
 
@@ -454,26 +504,149 @@ function initEditPaymentModal() {
 }
 
 function initEditManagerModal() {
+    var modalTitle = $('#editManagerModal').find('.modal-title');
+    var managerPhone = $('#editManagerModal').find('#edit-manager-number');
+    var managerName = $('#editManagerModal').find('#edit-manager-name');
+    var managerPassword = $('#editManagerModal').find('#edit-manager-password');
+
     $('#editManagerModal').on('show.bs.modal', function (event) {
         // Button that triggered the modal
         var button = $(event.relatedTarget);
         // Extract info from data-bs-* attributes
         var manager = button.data('manager');
 
-        var modalTitle = $('#editManagerModal').find('.modal-title');
-        var managerPhone = $('#editManagerModal').find('#edit-manager-number');
-        var managerName = $('#editManagerModal').find('#edit-manager-name');
 
         modalTitle.text(`Редактирование менеджера: ${manager.name}`);
         managerPhone.val(manager.phone_number);
         managerName.val(manager.name);
+        managerPassword.val(manager.password);
 
         $('#edit-btn').on('click', function () {
             editManager(manager.id, {
                 phone_number: managerPhone.val(),
                 name: managerName.val(),
+                password: managerPassword.val()
             });
         });
+    });
+}
+
+function initVisitModal() {
+    $('#editVisitModal').on('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = $(event.relatedTarget);
+        // Extract info from data-bs-* attributes
+        var visit = button.data('visit');
+
+        $('#edit-btn').on('click', function () {
+            editVisit(visit.id);
+        });
+    });
+}
+
+//edit visit
+function editVisit(id) {
+    $('#end_time_hour').removeClass('is-invalid');
+    $('#visit-end-error').text('');
+
+    var $form = $('#editVisit');
+    var end_time = $form.find("input[name='end_time_hour']").val();
+
+
+    $.ajax({
+        type: "PUT",
+        url: `/visits/${id}`,
+        data: {
+            end_time: end_time
+        },
+        success: function (data) {
+            alertMessage.saveMessage(data)
+
+            window.location.reload();
+        },
+        error: function (xhr, status, error) {
+            if (xhr.responseJSON.errors.hasOwnProperty('end_time')) {
+                $('#end_time_hour').addClass('is-invalid');
+                $('#visit-end-error').text(xhr.responseJSON.errors.end_time[0]);
+            }
+        }
+    });
+}
+
+
+function initVisitPaymentModal() {
+    $('#addPaymentField').click(function () {
+        var paymentField = $('#payment_fields .payment-field').first().clone();
+        paymentField.find('select').val('');
+        paymentField.find('.amount').val('');
+        paymentField.appendTo('#payment_fields');
+    });
+
+    $('#removePayment').click(function () {
+        const $paymentFields = $('#payment_fields .payment-field');
+
+        // Check if there is more than one payment field
+        if ($paymentFields.length > 1) {
+            // Remove the last payment field
+            $paymentFields.last().remove();
+        }
+    });
+
+    $('#editVisitPaymentModal').on('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = $(event.relatedTarget);
+        // Extract info from data-bs-* attributes
+        var visit = button.data('visit');
+
+
+        $('#edit-btn-payment').on('click', function () {
+            var payments = [];
+            var amounts = [];
+
+            $('.payment-field').each(function () {
+                var paymentType = $(this).find('select').val();
+                var amount = $(this).find('.amount').val();
+
+                if (paymentType && amount) {
+                    payments.push(paymentType);
+                    amounts.push(amount);
+                }
+            });
+
+            editVisitPayment(visit.id, payments, amounts);
+        });
+    });
+}
+
+//edit visit
+function editVisitPayment(id, payments, amounts) {
+    $('#payment').removeClass('is-invalid');
+    $('#visit-type-error').text('');
+    $('#amount').removeClass('is-invalid');
+    $('#visit-amount-error').text('');
+
+    $.ajax({
+        type: "PUT",
+        url: `/visits/payment/${id}`,
+        data: {
+            payment_types: payments,
+            payment_amounts: amounts,
+        },
+        success: function (data) {
+            alertMessage.saveMessage(data)
+
+            window.location.reload();
+        },
+        error: function (xhr, status, error) {
+            if (xhr.responseJSON.errors.hasOwnProperty('payment_types')) {
+                $('#payment').addClass('is-invalid');
+                $('#visit-type-error').text(xhr.responseJSON.errors.payment_amounts[0]);
+            }
+            if (xhr.responseJSON.errors.hasOwnProperty('start_time')) {
+                $('#start_time_hour').addClass('is-invalid');
+                $('#visit-start-error').text(xhr.responseJSON.errors.start_time[0]);
+            }
+        }
     });
 }
 
@@ -560,6 +733,7 @@ function editManager(id, manager) {
         data: {
             phone_number: manager.phone_number,
             name: manager.name,
+            password: manager.password,
         },
         success: function (data) {
             alertMessage.saveMessage(data)
@@ -575,6 +749,11 @@ function editManager(id, manager) {
             if (xhr.responseJSON.errors.hasOwnProperty('phone_number')) {
                 $('#edit-manager-number').addClass('is-invalid');
                 $('#edit-manager-phone_number-error').text(xhr.responseJSON.errors.phone_number[0]);
+            }
+
+            if (xhr.responseJSON.errors.hasOwnProperty('password')) {
+                $('#edit-manager-password').addClass('is-invalid');
+                $('#edit-manager-password-error').text(xhr.responseJSON.errors.password[0]);
             }
         }
     });

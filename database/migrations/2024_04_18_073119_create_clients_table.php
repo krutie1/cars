@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->string('first_name');
             $table->string('last_name');
             $table->string('patronymic')->nullable();
+            $table->integer('visits_count')->default(0);
+            $table->softDeletes();
         });
     }
 

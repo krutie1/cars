@@ -61,4 +61,9 @@ class User extends Authenticatable
     {
         return $this->hasRole(UserRolesEnum::ADMIN);
     }
+
+    public function isManager(): bool
+    {
+        return $this->hasRole(UserRolesEnum::MANAGER);
+    }
 }

@@ -35,14 +35,15 @@
                                 <td>{{ $payment -> name }}</td>
                                 <td class="space-evenly">
                                     @if($payment->deleted_at)
-                                        <i class="bi bi-arrow-clockwise text-success"
+                                        <i title="Вернуть" class="bi bi-arrow-clockwise text-success"
                                            onclick="restorePayment({{ $payment->id }})"
                                            style="cursor: pointer;"></i>
                                     @else
-                                        <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
+                                        <i title="Редактировать" class="bi bi-pencil-fill text-primary"
+                                           data-bs-toggle="modal"
                                            data-bs-target="#editPaymentModal" data-payment="{{ json_encode($payment) }}"
                                            style="cursor: pointer;"></i>
-                                        <i class="bi bi-trash-fill text-danger"
+                                        <i title="Удалить" class="bi bi-trash-fill text-danger"
                                            onclick="confirmDeletePayment({{ $payment->id }})"
                                            style="cursor: pointer;"></i>
                                     @endif

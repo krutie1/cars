@@ -47,13 +47,14 @@
                                 <td>{{ $manager -> phone_number}}</td>
                                 <td>{{ $manager-> name }}</td>
                                 <td>{{ implode(', ', $manager->roles) }}</td>
-                                <td>{{ $manager -> created_at}}</td>
+                                <td>{{ $manager -> created_at->format('d-m-Y H:i')}}</td>
                                 <td class="space-evenly">
-                                    <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
+                                    <i title="Редактировать" class="bi bi-pencil-fill text-primary"
+                                       data-bs-toggle="modal"
                                        data-bs-target="#editManagerModal" data-manager="{{ json_encode($manager) }}"
                                        style="cursor: pointer;"></i>
                                     @if(!in_array('admin', $manager -> roles))
-                                        <i class="bi bi-trash-fill text-danger"
+                                        <i title="Удалить" class="bi bi-trash-fill text-danger"
                                            onclick="confirmDeleteManager({{ $manager->id }})"
                                            style="cursor: pointer;"></i>
                                     @endif

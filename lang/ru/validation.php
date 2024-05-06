@@ -175,6 +175,12 @@ return [
     |
     */
     'attributes' => [
+        'client_id' => 'выбор клиента',
+        'payment_types' => 'тип оплаты',
+        'payment_amounts' => 'сумма',
+        'start_time_hour' => 'начало',
+        'end_time_hour' => 'конец',
+        'comment' => 'залог',
         'full_name' => 'имя',
         'phone_number' => 'номер телефона',
         'address' => 'адрес',

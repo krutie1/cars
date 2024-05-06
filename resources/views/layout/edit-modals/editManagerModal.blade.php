@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="editManager">
                     <div class="mb-3">
                         <label for="edit-manager-number" class="col-form-label">Номер телефона:</label>
                         <input type="number" pattern="[0-9]+" name="phone_number" class="form-control"
@@ -20,6 +20,18 @@
                         <input type="text" name="manager-name" class="form-control"
                                id="edit-manager-name"/>
                         <div id="edit-manager-name-error" class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-password" class="col-form-label">Пароль:</label>
+                        <div class="input-group">
+                            <input type="text" name="edit-password" class="manager_password form-control"
+                                   id="edit-manager-password"
+                                   autocomplete="new-password">
+                            <button type="button" class="btn btn-outline-secondary generate_password_btn">
+                                Сгенерировать
+                            </button>
+                            <div id="edit-manager-password-error" class="invalid-feedback"></div>
+                        </div>
                     </div>
                 </form>
             </div>

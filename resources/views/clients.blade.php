@@ -46,7 +46,7 @@
                                 <td>{{ $client -> id}}</td>
                                 <td>{{ $client -> phone_number}}</td>
                                 <td>{{ $client -> last_name }} {{ $client->first_name }} {{ $client->patronymic }}</td>
-                                <td>{{ $client -> created_at}}</td>
+                                <td>{{ $client -> created_at->format('d-m-Y H:i')}}</td>
                                 <td>
                                     {{ $client -> visits_count ?? 0 }}
                                 </td>
@@ -58,10 +58,12 @@
                                     @endif
                                 </td>
                                 <td class="space-evenly">
-                                    <i class="bi bi-pencil-fill text-primary" data-bs-toggle="modal"
+                                    <i title="Редактировать" class="bi bi-pencil-fill text-primary"
+                                       data-bs-toggle="modal"
                                        data-bs-target="#editClientModal" data-client="{{ json_encode($client) }}"
                                        style="cursor: pointer;"></i>
-                                    <i class="bi bi-trash-fill text-danger" onclick="confirmDelete({{ $client->id }})"
+                                    <i title="Удалить" class="bi bi-trash-fill text-danger"
+                                       onclick="confirmDelete({{ $client->id }})"
                                        style="cursor: pointer;"></i>
                                 </td>
                             </tr>

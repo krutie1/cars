@@ -1,19 +1,19 @@
 {{--    Edit Payment Modal--}}
-<div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentModalLabel"
+<div class="modal fade" id="editVisitModal" tabindex="-1" aria-labelledby="editVisitModalLabel"
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editPaymentModalLabel">Редактировать платёж</h5>
+                <h5 class="modal-title" id="editVisitModalLabel">Время завершения посещения</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editPayment">
+                <form id="editVisit">
                     <div class="mb-3">
-                        <label for="edit-payment-name" class="col-form-label">Название платежа:</label>
-                        <input type="text" name="edit-payment-name" class="form-control"
-                               id="edit-payment-name"/>
-                        <div id="edit-payment-name-error" class="invalid-feedback"></div>
+                        <label for="end_time_hour" class="col-form-label">Введите конец(end_time):</label>
+                        <input type="time" name="end_time_hour" class="form-control" id="end_time_hour"
+                               autocomplete="off" step="">
+                        <div id="visit-end-error" class="invalid-feedback"></div>
                     </div>
                 </form>
             </div>

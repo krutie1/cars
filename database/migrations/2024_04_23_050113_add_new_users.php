@@ -11,13 +11,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        //
         \App\Models\User::create([
             'name' => 'Admin',
             'roles' => [UserRolesEnum::ADMIN->value, \App\Enums\UserRolesEnum::MANAGER->value],
             'phone_number' => '87471337514',
             'password' => Hash::make('test')
         ]);
+
         \App\Models\User::create([
             'name' => 'User',
             'roles' => [UserRolesEnum::MANAGER->value],
