@@ -98,13 +98,25 @@ class VisitController extends Controller
         unset($validated['payment_types']);
         unset($validated['payment_amounts']);
 
+        $existingPayments = $visit->transactions()->pluck('payment_id')->toArray();
+
         foreach ($paymentTypes as $key => $paymentType) {
-            $transaction = new Transaction([
-                'visit_id' => $visit->id,
-                'payment_id' => $paymentType,
-                'amount' => $paymentAmounts[$key],
-            ]);
-            $transaction->save();
+            $amount = $paymentAmounts[$key];
+
+            if (in_array($paymentType, $existingPayments)) {
+                // Update existing transaction's amount
+                $transaction = $visit->transactions()->where('payment_id', $paymentType)->first();
+                $transaction->amount = $amount;
+                $transaction->save();
+            } else {
+                // Create new transaction
+                $transaction = new Transaction([
+                    'visit_id' => $visit->id,
+                    'payment_id' => $paymentType,
+                    'amount' => $amount,
+                ]);
+                $transaction->save();
+            }
         }
 
         $validated['payment_date'] = now();
@@ -112,15 +124,16 @@ class VisitController extends Controller
         if ($visit->update($validated)) {
             return response()->json([
                 'success' => true,
-                'message' => 'Поле оплаты обновлено'
+                'message' => 'Данные об оплате внесены'
             ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка обновления оплаты '
+                'message' => 'Ошибка при внесении оплаты'
             ], 404);
         }
     }
+
 
     public function filter(Request $request)
     {

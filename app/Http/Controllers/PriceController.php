@@ -42,9 +42,11 @@ class PriceController extends Controller
             }
         }
 
+        $prices = Price::query()->get();
 
         return view('prices', [
-            'message' => ''
+            'message' => '',
+            'prices' => $prices
         ]);
     }
 

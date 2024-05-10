@@ -87,7 +87,7 @@
                         </thead>
                         <tbody>
                         @foreach($visits as $visit)
-                            <tr class="{{ $visit -> deleted_at ? 'bg-danger text-white' : ''}}">
+                            <tr class="{{ $visit -> payment_date == null ? 'bg-secondary text-white' : ''}}">
                                 <td>{{ $visit -> id }}</td>
                                 <td class="{{ $visit -> clientTrashed -> deleted_at ? 'bg-danger text-white' : ''}}">
                                     {{ $visit -> clientTrashed -> phone_number }}
