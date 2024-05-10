@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('visits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained('clients');
-            $table->timestamp('start_time');
+            $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
             $table->string('comment');
             $table->decimal('cost', 10, 0)->default(0);

@@ -560,7 +560,7 @@ function editVisit(id) {
         success: function (data) {
             alertMessage.saveMessage(data)
 
-            // window.location.reload();
+            window.location.reload();
         },
         error: function (xhr, status, error) {
             if (xhr.responseJSON.errors.hasOwnProperty('end_time')) {
