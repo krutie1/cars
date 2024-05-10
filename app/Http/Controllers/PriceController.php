@@ -32,12 +32,14 @@ class PriceController extends Controller
 
                 return view('prices', [
                     'success' => true,
-                    'message' => 'Успешно'
+                    'message' => 'Успешно',
+                    'prices' => []
                 ]);
             } catch (Exception $e) {
                 return view('prices', [
                     'success' => false,
                     'message' => $e->getMessage(),
+                    'prices' => []
                 ]);
             }
         }
