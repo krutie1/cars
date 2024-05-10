@@ -249,7 +249,6 @@ function createVisit() {
                 comment: comment,
                 cost: cost,
                 user_id: user_id,
-
             },
             success: function (data) {
                 alertMessage.saveMessage(data);
@@ -552,7 +551,6 @@ function editVisit(id) {
     var $form = $('#editVisit');
     var end_time = $form.find("input[name='end_time_hour']").val();
 
-
     $.ajax({
         type: "PUT",
         url: `/visits/${id}`,
@@ -562,7 +560,7 @@ function editVisit(id) {
         success: function (data) {
             alertMessage.saveMessage(data)
 
-            window.location.reload();
+            // window.location.reload();
         },
         error: function (xhr, status, error) {
             if (xhr.responseJSON.errors.hasOwnProperty('end_time')) {
