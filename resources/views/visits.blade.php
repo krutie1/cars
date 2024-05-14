@@ -87,8 +87,7 @@
                         </thead>
                         <tbody>
                         @foreach($visits as $visit)
-                            <tr class="{{ !$visit -> cost ? 'bg-secondary text-white' : ''}}">
-
+                            <tr class="{{ !$visit -> end_time ? 'bg-secondary text-white' : ''}}">
                                 <td>Предмет залога</td>
                                 <td class="{{ $visit -> clientTrashed -> deleted_at ? 'bg-danger text-white' : ''}}">
                                     {{ $visit -> clientTrashed -> last_name }}
