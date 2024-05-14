@@ -31,9 +31,8 @@
                         class="table table-bordered">
                         <thead>
                         <tr>
-                            <th class="small-table-column">№</th>
-                            <th>Номер телефона</th>
                             <th>ФИО</th>
+                            <th>Номер телефона</th>
                             <th>Дата создания</th>
                             <th>Кол-во посещений</th>
                             <th>Последнее посещение</th>
@@ -41,18 +40,17 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($clients as $client)
+                        @foreach($clients as $index => $client)
                             <tr>
-                                <td>{{ $client -> id}}</td>
-                                <td>{{ $client -> phone_number}}</td>
                                 <td>{{ $client -> last_name }} {{ $client->first_name }} {{ $client->patronymic }}</td>
+                                <td>{{ $client -> phone_number}}</td>
                                 <td>{{ $client -> created_at->format('d-m-Y H:i')}}</td>
                                 <td>
                                     {{ $client -> visits_count ?? 0 }}
                                 </td>
                                 <td>
                                     @if($client->lastVisit)
-                                        {{ $client->lastVisit->created_at }}
+                                        {{ $client->lastVisit->created_at->format('d-m-Y H:i')  }}
                                     @else
                                         Нет посещений.
                                     @endif

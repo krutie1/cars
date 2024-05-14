@@ -2,8 +2,11 @@
 
 namespace App\Console;
 
+use App\Models\Visit;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -12,7 +15,21 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+//        $schedule->command('')->hourly();
+        $schedule->call(function () {
+            $visits = Visit::query()->with('client')->whereNull('payment_date')->get();
+
+            DB::transaction(function () use ($visits) {
+                $visits->each(function ($visit) {
+                    $client = $visit->client;
+                    $client->decrement('visits_count');
+
+                    $visit->delete();
+                });
+            });
+
+            Log::error("Schedule run");
+        })->daily();
     }
 
     /**
@@ -20,7 +37,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

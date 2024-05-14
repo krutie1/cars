@@ -27,7 +27,7 @@ class Client extends Model
 
     public function lastVisit()
     {
-        return $this->hasOne(Visit::class)->whereNull('deleted_at')->latest();
+        return $this->hasOne(Visit::class)->whereNull('deleted_at')->whereNotNull('payment_date')->latest();
     }
 
 }

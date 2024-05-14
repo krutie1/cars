@@ -32,9 +32,8 @@
                         class="table table-bordered">
                         <thead>
                         <tr>
-                            <th class="small-table-column">№</th>
-                            <th>Номер телефона</th>
                             <th>ФИО</th>
+                            <th>Номер телефона</th>
                             <th>Роли</th>
                             <th>Дата создания</th>
                             <th class="small-table-column">Действия</th>
@@ -43,9 +42,8 @@
                         <tbody>
                         @foreach($managers as $manager)
                             <tr>
-                                <td>{{ $manager -> id}}</td>
-                                <td>{{ $manager -> phone_number}}</td>
                                 <td>{{ $manager-> name }}</td>
+                                <td>{{ $manager -> phone_number}}</td>
                                 <td>{{ implode(', ', $manager->roles) }}</td>
                                 <td>{{ $manager -> created_at->format('d-m-Y H:i')}}</td>
                                 <td class="space-evenly">

@@ -16,6 +16,7 @@ class Visit extends Model
         'start_time',
         'end_time',
         'cost',
+        'discount',
         'user_id',
         'payment_date'
     ];

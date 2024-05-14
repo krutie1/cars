@@ -34,7 +34,7 @@ class ClientController extends Controller
         $clients = Client::with('lastVisit')
             ->withCount([
                 'visits' => function ($query) {
-                    $query->whereNull('deleted_at');
+                    $query->whereNull('deleted_at')->whereNotNull('payment_date');
                 }
             ])
             ->orderBy('id', 'desc')
@@ -69,7 +69,7 @@ class ClientController extends Controller
         $phone_number = $request->input('phone_number');
 
         $clientsExisting = Client::query()->with('lastVisit')->withCount(['visits' => function ($query) {
-            $query->whereNull('deleted_at');
+            $query->whereNull('deleted_at')->whereNotNull('payment_date');
         }]);
 
         if (empty($phone_number)) {

@@ -23,7 +23,6 @@
                         class="table table-bordered">
                         <thead>
                         <tr>
-                            <th class="small-table-column">№</th>
                             <th>Название платежа</th>
                             <th class="small-table-column">Действия</th>
                         </tr>
@@ -31,7 +30,6 @@
                         <tbody>
                         @foreach($payments as $payment)
                             <tr class="{{ $payment -> deleted_at ? 'bg-danger text-white' : ''}}">
-                                <td>{{ $payment -> id}}</td>
                                 <td>{{ $payment -> name }}</td>
                                 <td class="space-evenly">
                                     @if($payment->deleted_at)

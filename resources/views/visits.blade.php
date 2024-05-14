@@ -69,10 +69,10 @@
                         class="table table-bordered">
                         <thead>
                         <tr>
-                            <th class="small-table-column">№</th>
-                            <th>Номер телефона</th>
+                            <th>Предмет залога</th>
                             <th>ФИО</th>
-                            <th>Залог</th>
+                            <th>Номер телефона</th>
+                            <th>Наименование залога</th>
                             <th>Время начала</th>
                             <th>Время завершения</th>
                             <th>Общая стоимость</th>
@@ -80,32 +80,33 @@
                             <th>Оплачено</th>
                             @if(auth()->user()->isAdmin())
                                 <th>Дата создания</th>
-                                <th>Телефон менеджера</th>
+                                <th>Имя менеджера</th>
                             @endif
                             <th class="small-table-column">Действия</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($visits as $visit)
-                            <tr class="{{ $visit -> payment_date == null ? 'bg-secondary text-white' : ''}}">
-                                <td>{{ $visit -> id }}</td>
-                                <td class="{{ $visit -> clientTrashed -> deleted_at ? 'bg-danger text-white' : ''}}">
-                                    {{ $visit -> clientTrashed -> phone_number }}
-                                </td>
+                            <tr class="{{ !$visit -> cost ? 'bg-secondary text-white' : ''}}">
+
+                                <td>Предмет залога</td>
                                 <td class="{{ $visit -> clientTrashed -> deleted_at ? 'bg-danger text-white' : ''}}">
                                     {{ $visit -> clientTrashed -> last_name }}
                                     {{ $visit -> clientTrashed -> first_name }}
                                     {{ $visit -> clientTrashed -> patronymic }}
+                                </td>
+                                <td class="{{ $visit -> clientTrashed -> deleted_at ? 'bg-danger text-white' : ''}}">
+                                    {{ $visit -> clientTrashed -> phone_number }}
                                 </td>
                                 <td>{{ $visit -> comment }}</td>
                                 <td>{{ $visit -> start_time -> format('H:i') }}</td>
                                 <td>{{ $visit -> end_time ? $visit -> end_time -> format('H:i') : '--:--'}}</td>
                                 <td>{{ $visit -> cost }}</td>
                                 <td>{{ $visit -> discount }}%</td>
-                                <td>{!! $visit -> totalPayments  !!}</td>
+                                <td class="{{ $visit->cost != $visit->totalPayments ? 'bg-danger text-white' : '' }}">{!! $visit -> displayPayments  !!}</td>
                                 @if(auth()->user()->isAdmin())
                                     <td>{{ $visit->created_at->format('d-m-Y H:i') }}</td>
-                                    <td>{{ $visit -> userTrashed -> phone_number }}</td>
+                                    <td>{{ $visit -> userTrashed -> name }}</td>
                                 @endif
                                 <td class="space-around">
                                     <i title="Время завершения" class="bi bi-stopwatch-fill text-primary"

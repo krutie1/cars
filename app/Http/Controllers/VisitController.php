@@ -47,29 +47,29 @@ class VisitController extends Controller
         $validatedData['user_id'] = auth()->user()->id;
 
         $client = Client::find($validatedData['client_id']);
-
-        if ($client) {
-            $unpaidVisits = $client->visits()->whereNull('payment_date')->exists();
-
-            if ($unpaidVisits) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'У вас есть неоплаченное посещение, сделайте рассчет или удалите существующее посещение.',
-                ]);
-            }
-        }
+//
+//        if ($client) {
+//            $unpaidVisits = $client->visits()->whereNull('payment_date')->exists();
+//
+//            if ($unpaidVisits) {
+//                return response()->json([
+//                    'success' => false,
+//                    'message' => 'У вас есть неоплаченное посещение, сделайте рассчет или удалите существующее посещение.',
+//                ]);
+//            }
+//        }
 
 //        $visit = $this->createVisit($validatedData);
         $visit = Visit::create($validatedData);
 
-        $client->visits_count += 1;
-        $client->save();
+        $client->increment('visits_count');
 
         $discount = 0;
+        $visitsCount = $client->visits_count;
 
-        if ($client->visits_count % 10 === 0) {
+        if ($visitsCount % 10 === 0) {
             $discount = 100;
-        } else if ($client->visits_count % 5 === 0) {
+        } else if ($visitsCount % 5 === 0) {
             $discount = 50;
         }
 
@@ -205,6 +205,10 @@ class VisitController extends Controller
         $start = $visit->start_time;
         $end = Carbon::parse($validated['end_time']);
 
+        $end->year($start->year);
+        $end->month($start->month);
+        $end->day($start->day);
+
         // Check if end time is before start time
         if ($end < $start) {
             return response()->json([
@@ -213,8 +217,17 @@ class VisitController extends Controller
             ]);
         }
 
-        $visit->end_time = $end;
-        $visit->save();
+//        $client = $visit->client;
+//        if ($client) {
+//            // Perform operations related to the client
+//            $client->increment('visits_count');
+//        } else {
+//            // Handle the case where the client is not found
+//            return response()->json([
+//                'success' => false,
+//                'message' => 'Клиент не найден',
+//            ]);
+//        }
 
         $priceTable = Price::pluck('cost', 'minute')->toArray();
         if (!$priceTable) {
@@ -223,6 +236,9 @@ class VisitController extends Controller
                 'message' => 'Отсутвуют данные по тарифу, загрузите Excel'
             ]);
         }
+
+        $visit->end_time = $end;
+        $visit->save();
 
         $totalMinutes = $end->diffInMinutes($start);
 
@@ -250,11 +266,11 @@ class VisitController extends Controller
         }
 
         $discountedPrice = $totalPrice;
-        $client = $visit->client;
+        $visitDiscount = $visit->discount;
 
-        if ($client->visits_count % 10 === 0) {
+        if ($visitDiscount == 100) {
             $discountedPrice = 0;
-        } else if ($client->visits_count % 5 === 0) {
+        } else if ($visitDiscount == 50) {
             $discountedPrice = $totalPrice * 0.5;
         }
 
@@ -322,10 +338,12 @@ class VisitController extends Controller
             }
 
             if ($totalSum == 0) {
-                $visit->totalPayments = "--";
+                $visit->displayPayments = "--";
+                $visit->totalPayments = 0;
             } else {
                 $formattedPayments[] = "Сумма: $totalSum";
-                $visit->totalPayments = implode('<br>', $formattedPayments);
+                $visit->displayPayments = implode('<br>', $formattedPayments);
+                $visit->totalPayments = $totalSum;
             }
         }
     }

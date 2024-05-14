@@ -134,14 +134,39 @@ main {
     text-align: center;
 }
 
-table tr td:first-child {
-    text-align: center;
-}
+/*table tr td:first-child {*/
+/*    text-align: center;*/
+/*}*/
 
 .table > :not(caption) > * > * {
     background: transparent;
     color: inherit;
 }
+
+
+/*table {*/
+/*    width: 100%;*/
+/*    border-collapse: collapse;*/
+/*}*/
+
+/*th, td {*/
+/*    padding: 8px;*/
+/*    border: 1px solid #dddddd;*/
+/*}*/
+
+/*.sticky-header {*/
+/*    position: sticky;*/
+/*    top: 0;*/
+/*    background-color: #ffffff; !* Optional: Add a background color for the sticky header *!*/
+/*    z-index: 1000; !* Optional: Adjust the z-index to ensure the header appears above other elements *!*/
+
+
+/*    overflow-y: auto;*/
+/*}*/
+
+/*.table-responsive {*/
+/*    overflow: initial;*/
+/*}*/
 
 /*
     login
