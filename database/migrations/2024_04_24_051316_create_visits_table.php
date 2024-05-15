@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->decimal('cost', 10, 0)->default(0);
             $table->decimal('discount', 10, 0)->default(0);
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('car_id')->constrained('cars');
             $table->timestamp('payment_date')->nullable();
             $table->softDeletes();
             $table->timestamps();

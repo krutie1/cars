@@ -104,6 +104,11 @@ th {
     vertical-align: middle;
 }
 
+th, td {
+    vertical-align: top;
+}
+
+
 .nav-item a {
     display: flex;
     align-items: center;
@@ -125,9 +130,9 @@ main {
     overflow-x: hidden;
 }
 
-.main-left {
-    width: 280px;
-}
+/*.main-left {*/
+/*    width: 280px;*/
+/*}*/
 
 .small-table-column {
     width: 40px;
@@ -143,6 +148,20 @@ main {
     color: inherit;
 }
 
+.visit-header {
+    font-size: 1.3rem;
+
+    margin-bottom: 0;
+}
+
+.visit-header span {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.visit-bottom {
+    margin-bottom: 0;
+}
 
 /*table {*/
 /*    width: 100%;*/

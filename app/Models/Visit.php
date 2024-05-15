@@ -18,6 +18,7 @@ class Visit extends Model
         'cost',
         'discount',
         'user_id',
+        'car_id',
         'payment_date'
     ];
 
@@ -26,6 +27,16 @@ class Visit extends Model
         'end_time' => 'datetime',
         'payment_date' => 'datetime',
     ];
+
+    public function car()
+    {
+        return $this->belongsTo(Car::class);
+    }
+
+    public function carTrashed()
+    {
+        return $this->car()->withTrashed();
+    }
 
     public function user()
     {

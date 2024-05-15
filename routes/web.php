@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CarController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\PaymentController;
@@ -44,7 +45,7 @@ Route::prefix('/visits')->middleware('auth')->group(function () {
     Route::post('/create', [VisitController::class, 'store']);
 
     Route::get('/filter', [VisitController::class, 'filter'])->name('visit.filter');
-    Route::get('/find-by-phone', [VisitController::class, 'findByPhoneNumber'])->name('visit.findByPhone');
+    Route::get('/find', [VisitController::class, 'find'])->name('visit.find');
     Route::put('/{visit}', [VisitController::class, 'update']);
     Route::put('/payment/{visit}', [VisitController::class, 'setPayment']);
     Route::delete('/{visit}', [VisitController::class, 'destroy']);
@@ -54,7 +55,7 @@ Route::prefix('/visits')->middleware('auth')->group(function () {
 Route::prefix('/managers')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [ManagerController::class, 'index']);
     Route::post('/create', [ManagerController::class, 'store']);
-    Route::get('/find-by-phone', [ManagerController::class, 'findByPhoneNumber'])->name('manager.findByPhone');
+    Route::get('/find', [ManagerController::class, 'find'])->name('manager.find');
     Route::put('/{manager}', [ManagerController::class, 'update']);
     Route::delete('/{manager}', [ManagerController::class, 'destroy']);
 });
@@ -72,7 +73,7 @@ Route::prefix('/payments')->middleware(['auth', 'admin'])->group(function () {
 Route::prefix('/clients')->middleware('auth')->group(function () {
     Route::get('/', [ClientController::class, 'index'])->name('clients.index');
     Route::post('/create', [ClientController::class, 'store']);
-    Route::get('/find-by-phone', [ClientController::class, 'findByPhoneNumber'])->name('client.findByPhone');
+    Route::get('/find', [ClientController::class, 'find'])->name('client.find');
     Route::get('/search-client', [ClientController::class, 'searchClient'])->name('client.searchClient');
     Route::delete('/{client}', [ClientController::class, 'destroy']);
     Route::put('/{client}', [ClientController::class, 'update']);
@@ -82,6 +83,11 @@ Route::prefix('/clients')->middleware('auth')->group(function () {
 Route::prefix('/prices')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [PriceController::class, 'index'])->name('prices.page-import');
     Route::post('/', [PriceController::class, 'index'])->name('prices.import');
+});
+
+// Prices Routes
+Route::prefix('/cars')->middleware(['auth'])->group(function () {
+    Route::get('/', [CarController::class, 'index']);
 });
 
 

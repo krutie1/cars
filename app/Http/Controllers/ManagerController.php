@@ -13,7 +13,7 @@ class ManagerController extends Controller
 {
     public function index(Request $request)
     {
-        $managers = User::query()->orderBy('id', 'desc')->where('roles', 'like', '%' . UserRolesEnum::MANAGER->value . '%')->paginate(12);
+        $managers = User::query()->orderBy('id', 'desc')->where('roles', 'like', '%' . UserRolesEnum::MANAGER->value . '%')->paginate(7);
         /** @var LengthAwarePaginator $managers */
         $managers->links();
         return view('managers', compact('managers'));
@@ -60,14 +60,17 @@ class ManagerController extends Controller
         }
     }
 
-    public function findByPhoneNumber(Request $request)
+    public function find(Request $request)
     {
-        $phone_number = $request->input('phone_number');
+        $searchQuery = $request->input('search_query');
 
-        if (empty($phone_number)) {
-            $managers = User::orderBy('id', 'desc')->paginate(12);
+        if (empty($searchQuery)) {
+            $managers = User::orderBy('id', 'desc')->paginate(7);
         } else {
-            $managers = User::orderBy('id', 'desc')->where('phone_number', $phone_number)->paginate(12);
+            $managers = User::orderBy('id', 'desc')->where(function ($query) use ($searchQuery) {
+                $query->where('phone_number', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('name', 'like', '%' . $searchQuery . '%');
+            })->paginate(7);
         }
 
         return view('managers', compact('managers'));

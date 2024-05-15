@@ -14,16 +14,15 @@
                 data-bs-target="#createManagerModal">Добавить менеджера
             </button>
 
-            <form method="GET" action="{{ route('manager.findByPhone') }}" class="input-group mb-3">
-                <input name="phone_number" id="search-input" type="text" class="form-control"
-                       placeholder="Введите номер телефона"
-                       aria-label="Введите номер телефона"
-                       pattern="8[0-9]{10}"
+            <form method="GET" action="{{ route('manager.find') }}" class="input-group mb-3">
+                <input name="search_query" id="search-input" type="text" class="form-control"
+                       placeholder="Введите номер телефона или ФИО"
+                       aria-label="Введите номер телефона или ФИО"
                        aria-describedby="search-button">
                 <button class="btn btn-outline-secondary" type="submit" id="search-button">Поиск</button>
             </form>
 
-            <h2 class="text-center mb-3">Список Менеджеров</h2>
+            <h4 class="text-center mb-3">Список Менеджеров</h4>
             <div class="table-responsive">
                 @if($managers->isEmpty())
                     <p>Список менеджеров пуст.</p>

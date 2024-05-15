@@ -30,16 +30,20 @@ class PriceController extends Controller
                     }
                 });
 
+                $prices = Price::query()->get();
+
                 return view('prices', [
                     'success' => true,
                     'message' => 'Успешно',
-                    'prices' => collect()
+                    'prices' => $prices
                 ]);
             } catch (Exception $e) {
+                $prices = Price::query()->get();
+
                 return view('prices', [
                     'success' => false,
                     'message' => $e->getMessage(),
-                    'prices' => collect()
+                    'prices' => $prices
                 ]);
             }
         }
@@ -72,7 +76,7 @@ class PriceController extends Controller
             // check data type of current cells
             if (!is_numeric($cA) || !is_numeric($cB)) {
                 Log::error('Неверный тип данных в ячейке');
-                throw new Exception('Неверный тип данных в ячейке');
+                throw new Exception('Неверный тип данных в ячейке.' . "\n" . 'Таблица не была обновлена.');
             }
 
             // check minute increment and previous row
@@ -82,7 +86,7 @@ class PriceController extends Controller
                     'a' => $currentMin,
                     'prevMin' => $prevMin
                 ]);
-                throw new Exception('Не соблюдена последовательность минут');
+                throw new Exception('Не соблюдена последовательность минут.' . "\n" . 'Таблица не была обновлена.');
             }
 
             // check data length
@@ -91,7 +95,7 @@ class PriceController extends Controller
 
             if ($lastRow != $rowsNumber) {
                 Log::error('Неверный размер строк');
-                throw new Exception('Неверный размер строк');
+                throw new Exception('Неверный размер строк.' . "\n" . 'Таблица не была обновлена.');
             }
 
             // store validated data

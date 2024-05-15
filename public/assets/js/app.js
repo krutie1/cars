@@ -240,6 +240,8 @@ function createVisit() {
             user_id = $form.find("input[name='user_id']").val(),
             url = "/visits/create";
 
+        var car_id = $form.find("#carSelect").val();
+
         $.ajax({
             type: "POST",
             url: url,
@@ -249,6 +251,7 @@ function createVisit() {
                 comment: comment,
                 cost: cost,
                 user_id: user_id,
+                car_id: car_id
             },
             success: function (data) {
                 alertMessage.saveMessage(data);
@@ -264,9 +267,9 @@ function createVisit() {
                     $('#comment').addClass('is-invalid');
                     $('#visit-comment-error').text(xhr.responseJSON.errors.comment[0]);
                 }
-                if (xhr.responseJSON.errors.hasOwnProperty('payment_amounts')) {
-                    $('#amount').addClass('is-invalid');
-                    $('#visit-amount-error').text(xhr.responseJSON.errors.payment_types[0]);
+                if (xhr.responseJSON.errors.hasOwnProperty('start_time')) {
+                    $('#start_time_hour').addClass('is-invalid');
+                    $('#visit-start-error').text(xhr.responseJSON.errors.start_time[0]);
                 }
             }
         });
@@ -540,6 +543,33 @@ function initVisitModal() {
         $('#edit-btn').on('click', function () {
             editVisit(visit.id);
         });
+    });
+
+    $('#createVisitModal').on('show.bs.modal', function (e) {
+        fetchCarsAndPopulateOptions();
+    });
+}
+
+function fetchCarsAndPopulateOptions() {
+    $.ajax({
+        url: '/cars',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            var cars = response.cars;
+
+            // Clear existing options
+            $('#carSelect').empty();
+
+            // Append each car as an option
+            cars.forEach(function (car) {
+                console.log('Car ID:', car.id);
+                $('#carSelect').append('<option value="' + car.id + '">' + car.name + '</option>');
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        }
     });
 }
 

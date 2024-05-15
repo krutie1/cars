@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <form id="editVisit">
                     <div class="mb-3">
-                        <label for="end_time_hour" class="col-form-label">Введите конец(end_time):</label>
+                        <label for="end_time_hour" class="col-form-label">Введите конец:</label>
                         <input type="time" name="end_time_hour" class="form-control" id="end_time_hour"
                                autocomplete="off" step="">
                         <div id="visit-end-error" class="invalid-feedback"></div>

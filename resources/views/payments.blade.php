@@ -14,7 +14,7 @@
                 data-bs-target="#createPaymentModal">Добавить платёж
             </button>
 
-            <h2 class="text-center mb-3">Список Платежей</h2>
+            <h4 class="text-center mb-3">Список Платежей</h4>
             <div class="table-responsive">
                 @if($payments->isEmpty())
                     <p>Список платежей пуст.</p>

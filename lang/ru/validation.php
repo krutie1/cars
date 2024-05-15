@@ -175,6 +175,8 @@ return [
     |
     */
     'attributes' => [
+        'start_time' => 'начало',
+        'end_time' => 'конец',
         'client_id' => 'выбор клиента',
         'payment_types' => 'тип оплаты',
         'payment_amounts' => 'сумма',

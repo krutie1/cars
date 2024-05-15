@@ -38,7 +38,7 @@ class ClientController extends Controller
                 }
             ])
             ->orderBy('id', 'desc')
-            ->paginate(12);
+            ->paginate(7);
 
         return view('clients', compact('clients'));
     }
@@ -64,27 +64,37 @@ class ClientController extends Controller
 
     }
 
-    public function findByPhoneNumber(Request $request)
+    public function find(Request $request)
     {
-        $phone_number = $request->input('phone_number');
+        $searchQuery = $request->input('search_query');
 
         $clientsExisting = Client::query()->with('lastVisit')->withCount(['visits' => function ($query) {
             $query->whereNull('deleted_at')->whereNotNull('payment_date');
         }]);
 
-        if (empty($phone_number)) {
-            $clients = $clientsExisting->orderBy('id', 'desc')->paginate(12);
+        if (empty($searchQuery)) {
+            $clients = $clientsExisting->orderBy('id', 'desc')->paginate(7);
         } else {
-            $clients = $clientsExisting->where('phone_number', $phone_number)->orderBy('id', 'desc')->paginate(12);
+            $clients = $clientsExisting->where(function ($query) use ($searchQuery) {
+                $query->where('phone_number', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+            })->orderBy('id', 'desc')->paginate(7);
         }
 
         return view('clients', compact('clients'));
     }
 
+    // search client to display
     public function searchClient(Request $request)
     {
-        $query = $request->input('query');
-        $clients = Client::where('phone_number', 'like', '%' . $query . '%')->get();
+        $searchQuery = $request->input('query');
+
+        $clients = Client::where(function ($query) use ($searchQuery) {
+            $query->where('phone_number', 'like', '%' . $searchQuery . '%')
+                ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+        })->get();
 
         return response()->json([
             'success' => true,

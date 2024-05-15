@@ -22,7 +22,7 @@
 
             <div class="table-responsive">
                 @if($prices->isEmpty())
-                    <p>Список тарифов пуст.Загрузите Excel.</p>
+                    <p>Список тарифов пуст.</p>
                 @else
                     <table
                         class="mt-3 w-50 table table-bordered">

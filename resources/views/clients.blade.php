@@ -13,16 +13,15 @@
                 data-bs-target="#createClientModal">Добавить клиента
             </button>
 
-            <form method="GET" action="{{ route('client.findByPhone') }}" class="input-group mb-3">
-                <input name="phone_number" id="search-input" type="text" class="form-control"
-                       placeholder="Введите номер телефона"
-                       aria-label="Введите номер телефона"
-                       pattern="8[0-9]{10}"
+            <form method="GET" action="{{ route('client.find') }}" class="input-group mb-3">
+                <input name="search_query" id="search-input" type="text" class="form-control"
+                       placeholder="Введите номер телефона или ФИО"
+                       aria-label="Введите номер телефона или ФИО"
                        aria-describedby="search-button">
                 <button class="btn btn-outline-secondary" type="submit" id="search-button">Поиск</button>
             </form>
 
-            <h2 class="text-center mb-3">Список Клиентов</h2>
+            <h4 class="text-center mb-3">Список Клиентов</h4>
             <div class="table-responsive">
                 @if($clients->isEmpty())
                     <p>Список клиентов пуст.</p>

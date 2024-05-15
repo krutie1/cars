@@ -1,9 +1,9 @@
 <div class="main-left  d-none d-md-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        {{--                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>--}}
-        <img class="bi me-2 logo-img" src="{{ asset('assets/imgs/logo.jpg') }}" alt="Dido Cars">
-    </a>
-    <hr>
+    {{--    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">--}}
+    {{--        --}}{{--                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>--}}
+    {{--        <img class="bi me-2 logo-img" src="{{ asset('assets/imgs/logo.jpg') }}" alt="Dido Cars">--}}
+    {{--    </a>--}}
+    {{--    <hr>--}}
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
             <a href="/clients" class="nav-link {{ Request::is('clients*') ? 'active' : 'text-white'}}"
@@ -38,7 +38,8 @@
     </ul>
     <hr>
     <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+        <a href="#"
+           class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle"
            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
             {{--                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">--}}
             <strong>{{ auth()->user()-> name }}</strong>
@@ -58,11 +59,11 @@
 </div>
 
 <div class="d-md-none d-flex flex-column flex-shrink-0 bg-dark" style="width: 4.5rem;">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        {{--                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>--}}
-        <img class="bi logo-img" src="{{ asset('assets/imgs/logo.jpg') }}" alt="Dido Cars">
-    </a>
-    <hr>
+    {{--    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">--}}
+    {{--        --}}{{--                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>--}}
+    {{--        <img class="bi logo-img" src="{{ asset('assets/imgs/logo.jpg') }}" alt="Dido Cars">--}}
+    {{--    </a>--}}
+    {{--    <hr>--}}
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
             <a href="/clients" class="nav-link {{ Request::is('clients*') ? 'active' : 'text-white'}}"

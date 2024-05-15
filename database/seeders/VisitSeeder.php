@@ -2,10 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Car;
 use App\Models\Client;
 use App\Models\Visit;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
+
+// Add this import for the Car model
 
 class VisitSeeder extends Seeder
 {
@@ -15,6 +18,9 @@ class VisitSeeder extends Seeder
 
         // Get all clients from the database
         $clients = Client::all();
+
+        // Get all cars from the database
+        $cars = Car::all();
 
         // Loop through each client and create random visits
         foreach ($clients as $client) {
@@ -27,7 +33,10 @@ class VisitSeeder extends Seeder
                 $comment = $faker->sentence;
                 $cost = $faker->randomNumber(4) * 100; // Random cost between 0 and 9999
 
-                $userId = $faker->numberBetween(1, 2); // Assuming you have user IDs from 1 to 20
+                $userId = $faker->numberBetween(1, 2); // Assuming you have user IDs from 1 to 2
+
+                // Get a random car ID
+                $carId = $cars->random()->id;
 
                 // Create a new visit
                 Visit::create([
@@ -37,6 +46,7 @@ class VisitSeeder extends Seeder
                     'comment' => $comment,
                     'cost' => $cost,
                     'user_id' => $userId,
+                    'car_id' => $carId, // Assign the random car ID
                 ]);
             }
         }

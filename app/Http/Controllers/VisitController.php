@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Car;
 use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Price;
@@ -16,24 +17,27 @@ class VisitController extends Controller
 {
     public function index(Request $request)
     {
-        $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'paymentsTrashed'];
+        $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
+
+        $startDate = $request->input('start');
+        $endDate = $request->input('end');
 
         if (auth()->user()->isAdmin()) {
             $visits = Visit::with($with)
                 ->orderBy('id', 'desc')
-                ->paginate(12);
+                ->paginate(7);
         } else {
             $visits = Visit::with($with)
                 ->whereDate('created_at', now())
                 ->orderBy('id', 'desc')
-                ->paginate(12);
+                ->paginate(7);
         }
 
         $payments = Payment::query()->pluck('name', 'id');
 
         $this->calculateTotalPayments($visits);
 
-        return view('visits', compact('visits', 'payments'));
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate'));
     }
 
     public function store(Request $request)
@@ -41,25 +45,14 @@ class VisitController extends Controller
         $validatedData = $request->validate([
             'client_id' => 'required',
             'start_time' => 'required',
-            'comment' => 'required'
+            'comment' => 'required',
+            'car_id' => 'required'
         ]);
 
         $validatedData['user_id'] = auth()->user()->id;
 
         $client = Client::find($validatedData['client_id']);
-//
-//        if ($client) {
-//            $unpaidVisits = $client->visits()->whereNull('payment_date')->exists();
-//
-//            if ($unpaidVisits) {
-//                return response()->json([
-//                    'success' => false,
-//                    'message' => 'У вас есть неоплаченное посещение, сделайте рассчет или удалите существующее посещение.',
-//                ]);
-//            }
-//        }
 
-//        $visit = $this->createVisit($validatedData);
         $visit = Visit::create($validatedData);
 
         $client->increment('visits_count');
@@ -71,6 +64,14 @@ class VisitController extends Controller
             $discount = 100;
         } else if ($visitsCount % 5 === 0) {
             $discount = 50;
+        }
+
+        $carId = $validatedData['car_id'];
+
+        $car = Car::find($carId);
+        if ($car) {
+            $car->active = true;
+            $car->save();
         }
 
         $visit->discount = $discount;
@@ -121,7 +122,14 @@ class VisitController extends Controller
 
         $validated['payment_date'] = now();
 
+
         if ($visit->update($validated)) {
+            // removing active from cars
+            if ($visit->car) {
+                $visit->car->active = false;
+                $visit->car->save();
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Данные об оплате внесены'
@@ -140,7 +148,9 @@ class VisitController extends Controller
         $startDate = $request->input('start');
         $endDate = $request->input('end');
 
-        $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'paymentsTrashed'];
+        $total = 0;
+
+        $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
 
         if (!$endDate) {
             $endDate = now();
@@ -152,18 +162,80 @@ class VisitController extends Controller
                 ->whereDate('created_at', '<=', $endDate)
                 ->orderBy('id', 'desc');
 
-            $visits = $visitsQuery->paginate(12);
+            $visits = $visitsQuery->paginate(7);
         } else {
             if (auth()->user()->isAdmin()) {
                 $visits = Visit::with($with)
                     ->orderBy('id', 'desc')
-                    ->paginate(12);
+                    ->paginate(7);
             } else {
                 $visits = Visit::with($with)
                     ->whereDate('created_at', now())
                     ->orderBy('id', 'desc')
-                    ->paginate(12);
+                    ->paginate(7);
             }
+        }
+
+        $payments = Payment::pluck('name', 'id');
+
+        $this->calculateTotalPayments($visits);
+
+        if (!empty($startDate)) {
+            $startDate = Carbon::parse($startDate)->startOfDay();
+        }
+
+        if (!empty($endDate)) {
+            $endDate = Carbon::parse($endDate)->endOfDay();
+        }
+
+        $totalByType = [];
+
+        foreach ($visits as $visit) {
+            foreach ($visit->transactions as $transaction) {
+                $type = $transaction->paymentsTrashed->name;
+                $amount = $transaction->amount;
+                
+                if (isset($totalByType[$type])) {
+                    $totalByType[$type] += $amount;
+                } else {
+                    $totalByType[$type] = $amount;
+                }
+
+                $total += $amount;
+            }
+        }
+
+        $cash = 1200;
+
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType'));
+    }
+
+    public function find(Request $request)
+    {
+        $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
+
+        $searchQuery = $request->input('search_query');
+
+        $query = Visit::query()
+            ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                $query->when($searchQuery, function ($q) use ($searchQuery) {
+                    $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                });
+            })
+            ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                $query->when($searchQuery, function ($q) use ($searchQuery) {
+                    $q->where('name', 'like', '%' . $searchQuery . '%');
+                });
+            })
+            ->with($with)
+            ->orderBy('id', 'desc');
+
+        if (auth()->user()->isAdmin()) {
+            $visits = $query->paginate(7);
+        } else {
+            $visits = $query->whereDate('created_at', now())->paginate(7);
         }
 
         $payments = Payment::pluck('name', 'id');
@@ -173,28 +245,6 @@ class VisitController extends Controller
         return view('visits', compact('visits', 'payments'));
     }
 
-    public function findByPhoneNumber(Request $request)
-    {
-        $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'paymentsTrashed'];
-
-        $phoneNumber = $request->input('phone_number');
-
-        $visits = Visit::query()
-            ->whereHas('clientTrashed', function ($query) use ($phoneNumber) {
-                $query->when($phoneNumber, function ($q) use ($phoneNumber) {
-                    $q->where('phone_number', 'like', '%' . $phoneNumber . '%');
-                });
-            })
-            ->with($with)
-            ->orderBy('id', 'desc')
-            ->paginate(12);
-
-        $payments = Payment::pluck('name', 'id');
-
-        $this->calculateTotalPayments($visits);
-
-        return view('visits', compact('visits', 'payments'));
-    }
 
     public function update(Request $request, Visit $visit)
     {
@@ -296,6 +346,11 @@ class VisitController extends Controller
         $client = $visit->client;
 
         if ($visit->delete()) {
+            if ($visit->car) {
+                $visit->car->active = false;
+                $visit->car->save();
+            }
+
             $client->visits_count -= 1;
             $client->save();
 
