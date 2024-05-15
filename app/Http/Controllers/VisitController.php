@@ -37,7 +37,25 @@ class VisitController extends Controller
 
         $this->calculateTotalPayments($visits);
 
-        return view('visits', compact('visits', 'payments', 'startDate', 'endDate'));
+        $total = 0;
+        $totalByType = [];
+
+        foreach ($visits as $visit) {
+            foreach ($visit->transactions as $transaction) {
+                $type = $transaction->paymentsTrashed->name;
+                $amount = $transaction->amount;
+
+                if (isset($totalByType[$type])) {
+                    $totalByType[$type] += $amount;
+                } else {
+                    $totalByType[$type] = $amount;
+                }
+
+                $total += $amount;
+            }
+        }
+
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType'));
     }
 
     public function store(Request $request)
@@ -194,7 +212,7 @@ class VisitController extends Controller
             foreach ($visit->transactions as $transaction) {
                 $type = $transaction->paymentsTrashed->name;
                 $amount = $transaction->amount;
-                
+
                 if (isset($totalByType[$type])) {
                     $totalByType[$type] += $amount;
                 } else {
@@ -204,8 +222,6 @@ class VisitController extends Controller
                 $total += $amount;
             }
         }
-
-        $cash = 1200;
 
         return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType'));
     }
@@ -242,7 +258,25 @@ class VisitController extends Controller
 
         $this->calculateTotalPayments($visits);
 
-        return view('visits', compact('visits', 'payments'));
+        $total = 0;
+        $totalByType = [];
+
+        foreach ($visits as $visit) {
+            foreach ($visit->transactions as $transaction) {
+                $type = $transaction->paymentsTrashed->name;
+                $amount = $transaction->amount;
+
+                if (isset($totalByType[$type])) {
+                    $totalByType[$type] += $amount;
+                } else {
+                    $totalByType[$type] = $amount;
+                }
+
+                $total += $amount;
+            }
+        }
+
+        return view('visits', compact('visits', 'payments', 'total', 'totalByType'));
     }
 
 
