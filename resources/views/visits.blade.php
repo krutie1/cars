@@ -51,13 +51,20 @@
                         <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-3">
                             <input type="hidden" name="search_query"
                                    value="{{ request('search_query') }}">
-                            <button type="submit" class="btn btn-primary w-100">Фильтр</button>
+
+                            <input type="submit" name="action" value="Фильтр"
+                                   class="btn btn-primary w-100"/>
                         </div>
                         <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-3">
-                            <button type="submit" class="btn btn-success w-100">Выгрузить</button>
+                            <input type="submit" name="action" value="Выгрузить"
+                                   class="btn btn-success w-100"/>
                         </div>
                     </div>
                 </form>
+
+                <script>
+
+                </script>
             @endif
 
 

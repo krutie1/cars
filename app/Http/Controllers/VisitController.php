@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class VisitController extends Controller
 {
@@ -170,6 +172,8 @@ class VisitController extends Controller
         $endDate = $request->input('end');
         $searchQuery = $request->input('custom_search');
 
+        $action = $request->input('action');
+
         Log::error($searchQuery);
         $total = 0;
 
@@ -229,6 +233,64 @@ class VisitController extends Controller
                 $visits->whereDate('created_at', now());
             }
         }
+
+        // chck action
+        if ($action == 'Выгрузить') {
+            $visitsData = $visits->get();
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Add headers
+            $sheet->setCellValue('A1', 'Car Name');
+            $sheet->setCellValue('B1', 'Client Name');
+            $sheet->setCellValue('C1', 'Comment');
+            $sheet->setCellValue('D1', 'Start Time');
+            $sheet->setCellValue('E1', 'End Time');
+
+            // Populate data
+            $row = 2;
+            $transactionTypes = []; // Array to store unique transaction types
+
+            foreach ($visitsData as $visit) {
+                // Set the common data for each visit
+                $sheet->setCellValue('A' . $row, $visit->carTrashed->name);
+                $sheet->setCellValue('B' . $row, $visit->clientTrashed->last_name . ' ' . $visit->clientTrashed->first_name . ' ' . $visit->clientTrashed->patronymic);
+                $sheet->setCellValue('C' . $row, $visit->comment);
+                $sheet->setCellValue('D' . $row, $visit->start_time);
+                $sheet->setCellValue('E' . $row, $visit->end_time);
+
+                foreach ($visit->transactions as $transaction) {
+                    $type = $transaction->paymentsTrashed->name;
+                    $amount = $transaction->amount;
+
+                    // Check if the type already exists in the array
+                    if (!isset($transactionTypes[$type])) {
+                        // Add the type to the array
+                        $transactionTypes[$type] = count($transactionTypes) + 6; // Calculate the column index
+                        $sheet->setCellValueByColumnAndRow($transactionTypes[$type], 1, $type); // Set the column header
+                    }
+
+                    // Set the value in the corresponding column for the type
+                    $sheet->setCellValueByColumnAndRow($transactionTypes[$type], $row, $amount); // Set the cell value
+                }
+
+                $row++;
+            }
+
+            // Set headers for download
+            $filename = 'visits.xlsx';
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $filename . '"');
+            header('Cache-Control: max-age=0');
+
+            // Save the spreadsheet to output
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+
+            exit();
+        }
+
 
         $totalByType = [];
         $total = 0;
