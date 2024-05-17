@@ -5,6 +5,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PriceController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
@@ -90,5 +91,8 @@ Route::prefix('/cars')->middleware(['auth'])->group(function () {
     Route::get('/', [CarController::class, 'index']);
 });
 
-
+// Cash
+Route::prefix('/transactions')->middleware('auth')->group(function () {
+    Route::post('/', [TransactionController::class, 'insert'])->name('transactions.insert');
+});
 

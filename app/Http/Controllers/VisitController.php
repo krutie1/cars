@@ -22,16 +22,14 @@ class VisitController extends Controller
         $startDate = $request->input('start');
         $endDate = $request->input('end');
 
-        if (auth()->user()->isAdmin()) {
-            $visits = Visit::with($with)
-                ->orderBy('id', 'desc')
-                ->paginate(7);
-        } else {
-            $visits = Visit::with($with)
-                ->whereDate('created_at', now())
-                ->orderBy('id', 'desc')
-                ->paginate(7);
-        }
+
+        $query = Visit::with($with)
+            ->whereDate('created_at', now());
+
+        $allVisits = $query->get();
+        $visits = $query->orderBy('id', 'desc')->paginate(7);
+
+//        dd($allVisits);
 
         $payments = Payment::query()->pluck('name', 'id');
 
@@ -40,7 +38,7 @@ class VisitController extends Controller
         $total = 0;
         $totalByType = [];
 
-        foreach ($visits as $visit) {
+        foreach ($allVisits as $visit) {
             foreach ($visit->transactions as $transaction) {
                 $type = $transaction->paymentsTrashed->name;
                 $amount = $transaction->amount;
@@ -55,7 +53,11 @@ class VisitController extends Controller
             }
         }
 
-        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType'));
+        $dayAmount = Transaction::query()
+            ->where('payment_id', 1)
+            ->sum('amount');
+
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount'));
     }
 
     public function store(Request $request)
@@ -123,12 +125,10 @@ class VisitController extends Controller
             $amount = $paymentAmounts[$key];
 
             if (in_array($paymentType, $existingPayments)) {
-                // Update existing transaction's amount
                 $transaction = $visit->transactions()->where('payment_id', $paymentType)->first();
                 $transaction->amount = $amount;
                 $transaction->save();
             } else {
-                // Create new transaction
                 $transaction = new Transaction([
                     'visit_id' => $visit->id,
                     'payment_id' => $paymentType,
@@ -136,6 +136,9 @@ class VisitController extends Controller
                 ]);
                 $transaction->save();
             }
+
+            // trigger event
+
         }
 
         $validated['payment_date'] = now();
@@ -165,7 +168,9 @@ class VisitController extends Controller
     {
         $startDate = $request->input('start');
         $endDate = $request->input('end');
+        $searchQuery = $request->input('custom_search');
 
+        Log::error($searchQuery);
         $total = 0;
 
         $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
@@ -174,56 +179,98 @@ class VisitController extends Controller
             $endDate = now();
         }
 
+        $visits = Visit::with($with)
+            ->orderBy('id', 'desc');
+
         if ($startDate) {
-            $visitsQuery = Visit::with($with)
+            $visits
                 ->whereDate('created_at', '>=', $startDate)
                 ->whereDate('created_at', '<=', $endDate)
+                ->where(function ($query) use ($searchQuery) {
+                    $query
+                        ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where(function ($q) use ($searchQuery) {
+                                    return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                                });
+                            });
+                        })
+                        ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where('name', 'like', '%' . $searchQuery . '%');
+                            });
+                        });
+                })
                 ->orderBy('id', 'desc');
-
-            $visits = $visitsQuery->paginate(7);
         } else {
             if (auth()->user()->isAdmin()) {
-                $visits = Visit::with($with)
-                    ->orderBy('id', 'desc')
-                    ->paginate(7);
+                $visits
+                    ->whereDate('created_at', '<=', $endDate)
+                    ->where(function ($query) use ($searchQuery) {
+                        $query
+                            ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                                $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                    $query->where(function ($q) use ($searchQuery) {
+                                        return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                                            ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                                            ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                                    });
+                                });
+                            })
+                            ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                                $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                    $query->where('name', 'like', '%' . $searchQuery . '%');
+                                });
+                            });
+                    });
             } else {
-                $visits = Visit::with($with)
-                    ->whereDate('created_at', now())
-                    ->orderBy('id', 'desc')
-                    ->paginate(7);
+                $visits->whereDate('created_at', now());
             }
         }
+
+        $totalByType = [];
+        $total = 0;
+
+        $visits->clone()->chunk(100, function ($visits) use (&$total, &$totalByType) {
+            foreach ($visits as $visit) {
+                foreach ($visit->transactions as $transaction) {
+                    $type = $transaction->paymentsTrashed->name;
+                    $amount = $transaction->amount;
+
+                    if (isset($totalByType[$type])) {
+                        $totalByType[$type] += $amount;
+                    } else {
+                        $totalByType[$type] = $amount;
+                    }
+
+                    $total += $amount;
+                }
+            }
+        });
+
+
+        $visits = $visits->paginate(7)->appends(request()->query());
 
         $payments = Payment::pluck('name', 'id');
 
         $this->calculateTotalPayments($visits);
 
         if (!empty($startDate)) {
-            $startDate = Carbon::parse($startDate)->startOfDay();
+            $startDate = Carbon::parse($startDate);
         }
 
         if (!empty($endDate)) {
-            $endDate = Carbon::parse($endDate)->endOfDay();
+            $endDate = Carbon::parse($endDate);
         }
 
-        $totalByType = [];
+        $dayAmount = Transaction::query()
+            ->whereDate('created_at', '<=', $endDate)
+            ->where('payment_id', 1)
+            ->sum('amount');
 
-        foreach ($visits as $visit) {
-            foreach ($visit->transactions as $transaction) {
-                $type = $transaction->paymentsTrashed->name;
-                $amount = $transaction->amount;
-
-                if (isset($totalByType[$type])) {
-                    $totalByType[$type] += $amount;
-                } else {
-                    $totalByType[$type] = $amount;
-                }
-
-                $total += $amount;
-            }
-        }
-
-        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType'));
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount'));
     }
 
     public function find(Request $request)
@@ -233,26 +280,32 @@ class VisitController extends Controller
         $searchQuery = $request->input('search_query');
 
         $query = Visit::query()
-            ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
-                $query->when($searchQuery, function ($q) use ($searchQuery) {
-                    $q->where('phone_number', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
-                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
-                });
+            ->when(!auth()->user()->isAdmin(), function ($query) {
+                $query->whereDate('created_at', now());
             })
-            ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
-                $query->when($searchQuery, function ($q) use ($searchQuery) {
-                    $q->where('name', 'like', '%' . $searchQuery . '%');
-                });
+            ->where(function ($query) use ($searchQuery) {
+                $query
+                    ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                        $query->when($searchQuery, function ($query) use ($searchQuery) {
+                            $query->where(function ($q) use ($searchQuery) {
+                                return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                                    ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                                    ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                            });
+                        });
+                    })
+                    ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                        $query->when($searchQuery, function ($query) use ($searchQuery) {
+                            $query->where('name', 'like', '%' . $searchQuery . '%');
+                        });
+                    });
             })
             ->with($with)
             ->orderBy('id', 'desc');
 
-        if (auth()->user()->isAdmin()) {
-            $visits = $query->paginate(7);
-        } else {
-            $visits = $query->whereDate('created_at', now())->paginate(7);
-        }
+        $allVisits = $query;
+
+        $visits = $query->paginate(7);
 
         $payments = Payment::pluck('name', 'id');
 
@@ -261,7 +314,7 @@ class VisitController extends Controller
         $total = 0;
         $totalByType = [];
 
-        foreach ($visits as $visit) {
+        foreach ($allVisits as $visit) {
             foreach ($visit->transactions as $transaction) {
                 $type = $transaction->paymentsTrashed->name;
                 $amount = $transaction->amount;

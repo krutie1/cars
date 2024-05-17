@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('visit_id')->constrained('visits');
+            $table->foreignId('visit_id')->nullable()->constrained('visits');
             $table->foreignId('payment_id')->constrained('payments');
             $table->decimal('amount', 10, 0);
             $table->softDeletes();

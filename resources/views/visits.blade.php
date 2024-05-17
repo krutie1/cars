@@ -13,48 +13,53 @@
                 data-bs-toggle="modal"
                 data-bs-target="#createVisitModal">Новое посещение
             </button>
+            <button
+                type="button"
+                class="btn btn-success mb-3"
+                data-bs-toggle="modal"
+                data-bs-target="#cashModal">Касса
+            </button>
 
-
-            <form method="GET" action="{{ route('visit.find') }}" class="input-group mb-3">
-                <input name="search_query" id="search-input" type="text" class="form-control"
-                       placeholder="Введите номер телефона, ФИО или предмет проката"
-                       aria-label="Введите номер телефона, ФИО или предмет проката"
-                       aria-describedby="search-button">
-                <button class="btn btn-outline-secondary" type="submit">Поиск</button>
-            </form>
+            @if(!auth()->user()->isAdmin())
+                <form method="GET" action="{{ route('visit.find') }}" class="input-group mb-3">
+                    <input name="search_query" id="search-input" type="text" class="form-control"
+                           placeholder="Введите номер телефона, ФИО или предмет проката"
+                           aria-label="Введите номер телефона, ФИО или предмет проката"
+                           aria-describedby="search-button">
+                    <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+                </form>
+            @endif
 
             @if(auth()->user()->isAdmin())
                 <form method="GET" action="{{ route('visit.filter') }}">
+                    <input name="custom_search" id="search-input" type="text" class="form-control mb-3"
+                           placeholder="Введите номер телефона, ФИО или предмет проката"
+                           aria-label="Введите номер телефона, ФИО или предмет проката"
+                           aria-describedby="search-button"
+                           value="{{ request('custom_search') }}">
                     <div class="row pb-3 justify-content-end">
-                        {{--                        <div class="col-lg-2 col-md-3 col-sm-6 align-self-end">--}}
-
-                        {{--                        </div>--}}
-                        <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0 ">
+                        <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
                             <label for="start">Начало даты</label>
-                            <input type="date" name="start" class="form-control"/>
+                            <input type="date" name="start" class="form-control"
+                                   value="{{ request('start') }}"/>
                         </div>
                         <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
                             <label for="end">Конец даты</label>
-                            <input type="date" name="end" class="form-control"/>
+                            <input type="date" name="end" class="form-control"
+                                   value="{{ request('end') }}"/>
                         </div>
-                        {{--                        <div class="col-lg-2 col-md-3 col-sm-6 pt-2 pt-md-0">--}}
-                        {{--                            <label for="status">Статус</label>--}}
-                        {{--                            <select name="status" class="form-control">--}}
-                        {{--                                <option value="not_deleted" selected>Не удаленные</option>--}}
-                        {{--                                <option value="deleted">Удаленные</option>--}}
-                        {{--                                <option value="all">Все</option>--}}
-                        {{--                            </select>--}}
-                        {{--                        </div>--}}
                         <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-sm-0 mt-3">
-                            <button type="submit" class="btn btn-primary  w-100">Фильтр</button>
+                            <input type="hidden" name="search_query"
+                                   value="{{ request('search_query') }}">
+                            <button type="submit" class="btn btn-primary w-100">Фильтр</button>
                         </div>
                         <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-sm-0 mt-3">
                             <button type="submit" class="btn btn-success w-100">Выгрузить</button>
                         </div>
                     </div>
                 </form>
-
             @endif
+
 
             @if(!empty($startDate) && !empty($endDate))
                 <p class="visit-header text-center">
@@ -65,11 +70,13 @@
                 </p>
             @else
                 <h4 class="text-center">
-                    <span>{{ now()->format('d-m-Y') }}</span>
+                    <span>{{ !empty($endDate) && $endDate ? $endDate->format('d-m-Y') : now()->format('d-m-Y') }}</span>
                 </h4>
             @endif
 
-            <p class="visit-header text-center mb-3">Остаток в кассе: <span>----</span></p>
+            <p class="visit-header text-center mb-3">Остаток в кассе:
+                <span>{{ !empty($dayAmount) && $dayAmount ? $dayAmount : '----'}}</span>
+            </p>
 
             <div class="table-responsive">
                 @if($visits->isEmpty())
@@ -154,12 +161,13 @@
             <br>
             {{ $visits->links('pagination::bootstrap-5') }}
 
+
             <p class="visit-bottom text-center">Всего: {{ $total }}</p>
             @foreach($totalByType as $type => $amount)
                 <p class="visit-bottom text-center">{{ $type }}: <span>{{ $amount }}</span></p>
             @endforeach
-            <p class="visit-bottom text-center">Диляра: <span>!EachAmount</span> <span class="edit-span">edit</span></p>
-            <p class="visit-bottom text-center">В кассе: !Cass<span>!Amount</span></p>
+            {{--            <p class="visit-bottom text-center">Диляра: <span>!EachAmount</span> <span class="edit-span">edit</span></p>--}}
+            {{--            <p class="visit-bottom text-center">В кассе: !Cass<span>!Amount</span></p>--}}
 
             @if(request()->has('error'))
                 <div class="alert alert-danger" role="alert">
@@ -171,6 +179,7 @@
 
     @include('layout.create-modals.createVisitModal')
     @include('layout.edit-modals.editVisitModal')
+    @include('layout.cashModal')
     @include('layout.edit-modals.editVisitPaymentModal')
 @endsection
 

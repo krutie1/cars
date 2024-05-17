@@ -17,19 +17,23 @@ class Kernel extends ConsoleKernel
     {
 //        $schedule->command('')->hourly();
         $schedule->call(function () {
-            $visits = Visit::query()->with('client')->whereNull('payment_date')->get();
+            $visits = Visit::query()->with(['client', 'car'])->whereNull('payment_date')->get();
 
             DB::transaction(function () use ($visits) {
                 $visits->each(function ($visit) {
                     $client = $visit->client;
                     $client->decrement('visits_count');
 
+                    $car = $visit->car;
+                    $car->active = false;
+                    $car->save();
+
                     $visit->delete();
                 });
             });
 
             Log::error("Schedule run");
-        })->daily();
+        })->everyMinute();
     }
 
     /**
