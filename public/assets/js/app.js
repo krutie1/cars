@@ -240,7 +240,7 @@ function createVisit() {
             user_id = $form.find("input[name='user_id']").val(),
             url = "/visits/create";
 
-        var car_id = $form.find("#carSelect").val();
+        var car_id = $form.find(".carSelect").val();
 
         $.ajax({
             type: "POST",
@@ -545,8 +545,20 @@ function initVisitModal() {
         });
     });
 
-    $('#createVisitModal').on('show.bs.modal', function (e) {
+    $('#createVisitModal').on('show.bs.modal', function (event) {
         fetchCarsAndPopulateOptions();
+    });
+
+    $('#editCarModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var visit = button.data('visit');
+
+        fetchCarsAndPopulateOptions();
+
+        $('#edit-car').on('click', function () {
+            event.preventDefault();
+            updateCars(visit.id);
+        });
     });
 }
 
@@ -559,16 +571,39 @@ function fetchCarsAndPopulateOptions() {
             var cars = response.cars;
 
             // Clear existing options
-            $('#carSelect').empty();
+            $('.carSelect').empty();
 
             // Append each car as an option
             cars.forEach(function (car) {
-                console.log('Car ID:', car.id);
-                $('#carSelect').append('<option value="' + car.id + '">' + car.name + '</option>');
+                $('.carSelect').append('<option value="' + car.id + '">' + car.name + '</option>');
             });
         },
         error: function (xhr, status, error) {
             console.error(xhr.responseText);
+        }
+    });
+}
+
+function updateCars(visitId) {
+    var $form = $('#editCar');
+    var carId = $form.find(".carSelect").val();
+
+    $.ajax({
+        type: "PUT",
+        url: `/cars/${visitId}`,
+        data: {
+            car_id: carId
+        },
+        success: function (data) {
+            alertMessage.saveMessage(data)
+
+            window.location.reload();
+        },
+        error: function (xhr, status, error) {
+            if (xhr.responseJSON.errors.hasOwnProperty('end_time')) {
+                $('#end_time_hour').addClass('is-invalid');
+                $('#visit-end-error').text(xhr.responseJSON.errors.end_time[0]);
+            }
         }
     });
 }

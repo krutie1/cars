@@ -135,7 +135,8 @@
                                     @if(!$visit -> deleted_at && !$visit -> payment_date)
                                         <i title="Редактировать машинку" class="bi bi-cart-fill text-primary"
                                            data-bs-toggle="modal"
-                                           data-bs-target="#"
+                                           data-bs-target="#editCarModal"
+                                           data-visit="{{ $visit }}"
                                            style="cursor: pointer;"></i>
                                     @endif
 
@@ -186,6 +187,7 @@
 
     @include('layout.create-modals.createVisitModal')
     @include('layout.edit-modals.editVisitModal')
+    @include('layout.edit-modals.editCarModal')
     @include('layout.cashModal')
     @include('layout.edit-modals.editVisitPaymentModal')
 @endsection

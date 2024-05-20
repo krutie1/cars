@@ -24,7 +24,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="carSelect" class="col-form-label">Предмет проката:</label>
-                        <select name="car_id" id="carSelect" class="form-control">
+                        <select name="car_id" class="carSelect form-control">
                             <!-- Options will be populated dynamically -->
                         </select>
                         <div id="visit-car-error" class="invalid-feedback"></div>

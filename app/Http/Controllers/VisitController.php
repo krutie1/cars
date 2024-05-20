@@ -165,7 +165,6 @@ class VisitController extends Controller
         }
     }
 
-
     public function filter(Request $request)
     {
         $startDate = $request->input('start');
@@ -268,11 +267,11 @@ class VisitController extends Controller
                     if (!isset($transactionTypes[$type])) {
                         // Add the type to the array
                         $transactionTypes[$type] = count($transactionTypes) + 6; // Calculate the column index
-                        $sheet->setCellValueByColumnAndRow($transactionTypes[$type], 1, $type); // Set the column header
+                        $sheet->setCellValue([$transactionTypes[$type], 1], $type); // Set the column header
                     }
 
                     // Set the value in the corresponding column for the type
-                    $sheet->setCellValueByColumnAndRow($transactionTypes[$type], $row, $amount); // Set the cell value
+                    $sheet->setCellValue([$transactionTypes[$type], $row], $amount); // Set the cell value
                 }
 
                 $row++;

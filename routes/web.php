@@ -89,6 +89,7 @@ Route::prefix('/prices')->middleware(['auth', 'admin'])->group(function () {
 // Prices Routes
 Route::prefix('/cars')->middleware(['auth'])->group(function () {
     Route::get('/', [CarController::class, 'index']);
+    Route::put('/{visit}', [CarController::class, 'update']);
 });
 
 // Cash
