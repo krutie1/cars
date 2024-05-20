@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
             });
 
             Log::error("Schedule run");
-        })->everyMinute();
+        })->daily();
     }
 
     /**
