@@ -241,11 +241,11 @@ class VisitController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Add headers
-            $sheet->setCellValue('A1', 'Car Name');
-            $sheet->setCellValue('B1', 'Client Name');
-            $sheet->setCellValue('C1', 'Comment');
-            $sheet->setCellValue('D1', 'Start Time');
-            $sheet->setCellValue('E1', 'End Time');
+            $sheet->setCellValue('A1', 'Номер машинки');
+            $sheet->setCellValue('B1', 'ФИО Клиента');
+            $sheet->setCellValue('C1', 'Наименование залога');
+            $sheet->setCellValue('D1', 'Начало');
+            $sheet->setCellValue('E1', 'Конец');
 
             // Populate data
             $row = 2;
