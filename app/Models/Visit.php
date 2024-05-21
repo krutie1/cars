@@ -19,13 +19,17 @@ class Visit extends Model
         'discount',
         'user_id',
         'car_id',
-        'payment_date'
+        'payment_date',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
         'payment_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function car()

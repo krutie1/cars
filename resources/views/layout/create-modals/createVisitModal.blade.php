@@ -39,6 +39,17 @@
                         <button type="submit" class="btn btn-primary">Сохранить посещение</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                     </div>
+                    <div class="mb-3 d-none">
+                        <label for="visit_date" class="col-form-label">Дата посещения:</label>
+                        <input type="date" name="visit_date" class="form-control" id="visit_date" autocomplete="off">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="specialDateCheck">
+                        <label class="form-check-label" for="specialDateCheck">
+                            Специальная дата (19/05/2023)
+                        </label>
+                    </div>
+
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul>

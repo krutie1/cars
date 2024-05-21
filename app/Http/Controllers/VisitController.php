@@ -25,8 +25,8 @@ class VisitController extends Controller
         $endDate = $request->input('end');
 
 
-        $query = Visit::with($with)
-            ->whereDate('created_at', now());
+        $query = Visit::with($with);
+//            ->whereDate('created_at', now());
 
         $allVisits = $query->get();
         $visits = $query->orderBy('id', 'desc')->paginate(7);
@@ -68,10 +68,18 @@ class VisitController extends Controller
             'client_id' => 'required',
             'start_time' => 'required',
             'comment' => 'required',
-            'car_id' => 'required'
+            'car_id' => 'required',
+            'visit_date' => 'nullable|date|date_format:Y-m-d'
         ]);
 
         $validatedData['user_id'] = auth()->user()->id;
+
+        if ($request->has('visit_date')) {
+            $validatedData['created_at'] = $request->input('visit_date') . ' 00:00:00';
+            $validatedData['updated_at'] = $request->input('visit_date') . ' 00:00:00';
+        }
+
+        unset($validatedData['visit_date']);
 
         $client = Client::find($validatedData['client_id']);
 
@@ -208,29 +216,29 @@ class VisitController extends Controller
                 })
                 ->orderBy('id', 'desc');
         } else {
-            if (auth()->user()->isAdmin()) {
-                $visits
-                    ->whereDate('created_at', '<=', $endDate)
-                    ->where(function ($query) use ($searchQuery) {
-                        $query
-                            ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
-                                $query->when($searchQuery, function ($query) use ($searchQuery) {
-                                    $query->where(function ($q) use ($searchQuery) {
-                                        return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
-                                            ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
-                                            ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
-                                    });
-                                });
-                            })
-                            ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
-                                $query->when($searchQuery, function ($query) use ($searchQuery) {
-                                    $query->where('name', 'like', '%' . $searchQuery . '%');
+//            if (auth()->user()->isAdmin()) {
+            $visits
+                ->whereDate('created_at', '<=', $endDate)
+                ->where(function ($query) use ($searchQuery) {
+                    $query
+                        ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where(function ($q) use ($searchQuery) {
+                                    return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
                                 });
                             });
-                    });
-            } else {
-                $visits->whereDate('created_at', now());
-            }
+                        })
+                        ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where('name', 'like', '%' . $searchQuery . '%');
+                            });
+                        });
+                });
+//            } else {
+//                $visits->whereDate('created_at', now());
+//            }
         }
 
         // chck action
@@ -341,9 +349,9 @@ class VisitController extends Controller
         $searchQuery = $request->input('search_query');
 
         $query = Visit::query()
-            ->when(!auth()->user()->isAdmin(), function ($query) {
-                $query->whereDate('created_at', now());
-            })
+//            ->when(!auth()->user()->isAdmin(), function ($query) {
+//                $query->whereDate('created_at', now());
+//            })
             ->where(function ($query) use ($searchQuery) {
                 $query
                     ->whereHas('clientTrashed', function ($query) use ($searchQuery) {

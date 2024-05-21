@@ -221,6 +221,24 @@ function createVisit() {
         $('#client_id_input').val(clientId);
     });
 
+    // Handle date input and checkbox interaction
+    const visitDateInput = document.getElementById('visit_date');
+    const specialDateCheck = document.getElementById('specialDateCheck');
+
+    visitDateInput.addEventListener('change', function () {
+        if (this.value === '2023-01-01') {
+            specialDateCheck.checked = true;
+        } else {
+            specialDateCheck.checked = false;
+        }
+    });
+
+    specialDateCheck.addEventListener('change', function () {
+        if (this.checked) {
+            visitDateInput.value = '2023-01-01';
+        }
+    });
+
     $('#createVisit').on('submit', function (e) {
         e.preventDefault();
 
@@ -237,6 +255,7 @@ function createVisit() {
             start_time = $form.find("input[name='start_time_hour']").val(),
             comment = $form.find("input[name='comment']").val(),
             cost = $form.find("input[name='cost']").val(),
+            visit_date = $form.find("input[name='visit_date']").val(),
             user_id = $form.find("input[name='user_id']").val(),
             url = "/visits/create";
 
@@ -251,6 +270,7 @@ function createVisit() {
                 comment: comment,
                 cost: cost,
                 user_id: user_id,
+                visit_date: visit_date,
                 car_id: car_id
             },
             success: function (data) {

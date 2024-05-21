@@ -152,12 +152,11 @@
                                            style="cursor: pointer;"></i>
                                     @endif
 
-                                    @if(!$visit -> deleted_at && !$visit -> payment_date)
+                                    @if(!$visit -> deleted_at && !$visit -> payment_date || auth()->user()->isAdmin())
                                         <i title="Удалить" class="bi bi-trash-fill text-danger"
                                            onclick="confirmDeleteVisit({{ $visit -> id }})"
                                            style="cursor: pointer;"></i>
                                     @endif
-
                                 </td>
                             </tr>
 
