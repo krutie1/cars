@@ -108,7 +108,7 @@ class ClientController extends Controller
         $validated = $request->validate([
             'phone_number' => ['required', 'regex:/^8\d{10}$/', (new Unique('clients'))->withoutTrashed()->ignoreModel($client)],
             'first_name' => 'required',
-            'last_name' => 'required',
+            'last_name' => 'nullable',
             'patronymic' => 'nullable',
         ], [
             'unique' => 'Пользователь с таким номером телефона уже существует',
