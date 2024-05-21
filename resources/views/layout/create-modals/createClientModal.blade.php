@@ -24,7 +24,7 @@
                         <div id="client-first_name-error" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="last_name" class="col-form-label">Введите фамилию:</label>
+                        <label for="last_name" class="col-form-label">Введите фамилию (Необязательно):</label>
                         <input type="text" name="last_name" class="form-control" id="create-last_name"
                                autocomplete="off">
                         <div id="client-last_name-error" class="invalid-feedback"></div>
