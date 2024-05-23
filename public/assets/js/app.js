@@ -215,7 +215,7 @@ function createVisit() {
         var clientId = $(this).data('client-id');
         var client = $(this).data('client');
 
-        $('#searchClient').val(`${client.last_name} ${client.first_name} ${client.patronymic ?? ''} | ${client.phone_number}`);
+        $('#searchClient').val(`${client.last_name ?? ''} ${client.first_name} ${client.patronymic ?? ''} | ${client.phone_number}`);
         $('#searchResults').html('');
 
         $('#client_id_input').val(clientId);
