@@ -179,7 +179,6 @@ function createManager() {
     });
 }
 
-// create createVisit
 function createVisit() {
     $('#searchClient').on('input', function () {
         var query = $(this).val();
@@ -261,18 +260,23 @@ function createVisit() {
 
         var car_id = $form.find(".carSelect").val();
 
+        var data = {
+            client_id: client_id,
+            start_time: start_time,
+            comment: comment,
+            cost: cost,
+            user_id: user_id,
+            car_id: car_id
+        };
+
+        if (visit_date) {
+            data.visit_date = visit_date;
+        }
+
         $.ajax({
             type: "POST",
             url: url,
-            data: {
-                client_id: client_id,
-                start_time: start_time,
-                comment: comment,
-                cost: cost,
-                user_id: user_id,
-                visit_date: visit_date,
-                car_id: car_id
-            },
+            data: data,
             success: function (data) {
                 alertMessage.saveMessage(data);
 
@@ -296,6 +300,7 @@ function createVisit() {
     });
 
 }
+
 
 // create createPayment
 function createPayment() {
