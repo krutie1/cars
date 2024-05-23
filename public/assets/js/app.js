@@ -195,7 +195,7 @@ function createVisit() {
                             var clientHtml =
                                 `<div class="client-item card w-50 mt-3 mb-3 client-card" data-client=${JSON.stringify(client)} data-client-id="${client.id}">
                                     <div class="card-body">
-                                        <span class="card-title">ФИО: ${client.first_name} ${client.last_name} ${client.patronymic ?? ''}</span><br>
+                                        <span class="card-title">ФИО: ${client.last_name ?? ''} ${client.first_name} ${client.patronymic ?? ''}</span><br>
                                         <span class="body">Номер: ${client.phone_number}</span>
                                     </div>
                                 </div>`;

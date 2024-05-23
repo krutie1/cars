@@ -75,13 +75,11 @@ class VisitController extends Controller
         $validatedData['user_id'] = auth()->user()->id;
 
         if ($request->has('visit_date')) {
+            $validatedData['created_at'] = $request->input('visit_date') . ' 00:00:00';
+            $validatedData['updated_at'] = $request->input('visit_date') . ' 00:00:00';
 
-            if ($validatedData['visit_date']) {
-                $validatedData['created_at'] = $request->input('visit_date') . ' 00:00:00';
-                $validatedData['updated_at'] = $request->input('visit_date') . ' 00:00:00';
-
-                $validatedData['end_time'] = $validatedData['start_time'];
-            }
+            $validatedData['end_time'] = $validatedData['start_time'];
+            $validatedData['payment_date'] = $request->input('visit_date') . ' 00:00:00';
         }
 
         unset($validatedData['visit_date']);
@@ -554,7 +552,7 @@ class VisitController extends Controller
             }
 
             if ($totalSum == 0) {
-                $visit->displayPayments = "--";
+                $visit->displayPayments = "0";
                 $visit->totalPayments = 0;
             } else {
                 $formattedPayments[] = "Сумма: $totalSum";

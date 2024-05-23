@@ -49,7 +49,7 @@
                             Специальная дата (01/01/2023)
                         </label>
                     </div>
-
+                    <input type="hidden" name="special_date" id="special_date_input" value="0">
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul>
