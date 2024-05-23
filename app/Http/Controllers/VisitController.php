@@ -76,7 +76,7 @@ class VisitController extends Controller
 
         $validatedData['user_id'] = auth()->user()->id;
 
-        if ($request->has('visit_date')) {
+        if ($request->has('visit_date') && !empty($request->input('visit_date'))) {
             $validatedData['created_at'] = $request->input('visit_date') . ' 00:00:00';
             $validatedData['updated_at'] = $request->input('visit_date') . ' 00:00:00';
 
