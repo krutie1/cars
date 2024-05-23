@@ -519,6 +519,10 @@ class VisitController extends Controller
             $client->visits_count -= 1;
             $client->save();
 
+            $visit->transactions()->each(function ($transaction) {
+                $transaction->delete();
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => 'Посещение успешно удалено',
