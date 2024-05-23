@@ -73,6 +73,7 @@ class VisitController extends Controller
         ]);
 
         $carId = $validatedData['car_id'];
+        $car = Car::find($carId);
 
         $validatedData['user_id'] = auth()->user()->id;
 
@@ -83,9 +84,13 @@ class VisitController extends Controller
             $validatedData['end_time'] = $validatedData['start_time'];
             $validatedData['payment_date'] = $request->input('visit_date') . ' 00:00:00';
 
-            $car = Car::find($carId);
             if ($car) {
                 $car->active = false;
+                $car->save();
+            }
+        } else {
+            if ($car) {
+                $car->active = true;
                 $car->save();
             }
         }
@@ -107,11 +112,6 @@ class VisitController extends Controller
             $discount = 50;
         }
 
-        $car = Car::find($carId);
-        if ($car && $car->active !== false) {
-            $car->active = true;
-            $car->save();
-        }
 
         $visit->discount = $discount;
         $visit->save();
