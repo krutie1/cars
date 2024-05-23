@@ -77,6 +77,8 @@ class VisitController extends Controller
         if ($request->has('visit_date')) {
             $validatedData['created_at'] = $request->input('visit_date') . ' 00:00:00';
             $validatedData['updated_at'] = $request->input('visit_date') . ' 00:00:00';
+
+            $validatedData['end_time'] = $validatedData['start_time'];
         }
 
         unset($validatedData['visit_date']);

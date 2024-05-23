@@ -46,7 +46,7 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="specialDateCheck">
                         <label class="form-check-label" for="specialDateCheck">
-                            Специальная дата (19/05/2023)
+                            Специальная дата (01/01/2023)
                         </label>
                     </div>
 
