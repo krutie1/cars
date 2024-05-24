@@ -664,7 +664,7 @@ function editVisit(id) {
 
 function initVisitPaymentModal() {
     $('#addPaymentField').click(function () {
-        var paymentField = $('#payment_fields .payment-field').first().clone();
+        var paymentField = $('#payment_fields .payment-field-template').clone().removeClass('payment-field-template d-none').addClass('payment-field');
         paymentField.find('select').val('');
         paymentField.find('.amount').val('');
         paymentField.appendTo('#payment_fields');
@@ -680,14 +680,14 @@ function initVisitPaymentModal() {
         }
     });
 
+
     $('#editVisitPaymentModal').on('show.bs.modal', function (event) {
         // Button that triggered the modal
         var button = $(event.relatedTarget);
         // Extract info from data-bs-* attributes
         var visit = button.data('visit');
 
-        // // Clear existing fields
-        // $('#payment_fields').empty();
+        $('#payment_fields .payment-field').remove();
 
         // Fetch existing payment data
         $.ajax({
@@ -695,18 +695,16 @@ function initVisitPaymentModal() {
             method: 'GET',
             success: function (data) {
                 data.forEach(function (payment) {
-                    var paymentField = $('#payment_fields .payment-field');
+                    var paymentField = $('#payment_fields .payment-field-template').clone().removeClass('payment-field-template d-none').addClass('payment-field');
                     paymentField.find('select').val(payment.payment_id);
                     paymentField.find('.amount').val(payment.amount);
                     paymentField.appendTo('#payment_fields');
-
-                    console.log(payment.payment_id)
-                    console.log(payment.amount)
                 });
 
                 console.log(data)
             }
         });
+
 
         $('#edit-btn-payment').on('click', function () {
             var payments = [];
