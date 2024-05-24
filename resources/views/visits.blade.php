@@ -32,11 +32,14 @@
 
             {{--            @if(auth()->user()->isAdmin())--}}
             <form method="GET" action="{{ route('visit.filter') }}">
-                <input name="custom_search" id="search-input" type="text" class="form-control mb-3"
-                       placeholder="Введите номер телефона, ФИО или предмет проката"
-                       aria-label="Введите номер телефона, ФИО или предмет проката"
-                       aria-describedby="search-button"
-                       value="{{ request('custom_search') }}">
+
+                @if(auth()->user()->isAdmin())
+                    <input name="custom_search" id="search-input" type="text" class="form-control mb-3"
+                           placeholder="Введите номер телефона, ФИО или предмет проката"
+                           aria-label="Введите номер телефона, ФИО или предмет проката"
+                           aria-describedby="search-button"
+                           value="{{ request('custom_search') }}">
+                @endif
                 <div class="row pb-3 justify-content-end">
                     <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
                         <label for="start">Начало даты</label>
