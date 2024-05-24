@@ -29,8 +29,11 @@ class ManagerController extends Controller
             'unique' => 'Пользователь с таким номером телефона уже существует'
         ]);
 
-        if (User::withTrashed()->where('phone_number', $validated['phone_number'])->exists()) {
-            $user = User::restore($validated);
+        $user = User::withTrashed()->where('phone_number', $validated['phone_number'])->first();
+
+        if ($user) {
+            $user->restore();
+            $user->update($validated); // Optionally update the user's details
         } else {
             $user = User::create($validated);
         }
@@ -38,7 +41,7 @@ class ManagerController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Менеджер успешно создан',
-            'client' => $user
+            'user' => $user
         ]);
     }
 
