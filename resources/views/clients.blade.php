@@ -59,9 +59,11 @@
                                        data-bs-toggle="modal"
                                        data-bs-target="#editClientModal" data-client="{{ json_encode($client) }}"
                                        style="cursor: pointer;"></i>
-                                    <i title="Удалить" class="bi bi-trash-fill text-danger"
-                                       onclick="confirmDelete({{ $client->id }})"
-                                       style="cursor: pointer;"></i>
+                                    @if(auth()->user()->isAdmin())
+                                        <i title="Удалить" class="bi bi-trash-fill text-danger"
+                                           onclick="confirmDelete({{ $client->id }})"
+                                           style="cursor: pointer;"></i>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
