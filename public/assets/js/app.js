@@ -89,7 +89,6 @@ function createClient() {
         $('#create-phone_number').removeClass('is-invalid');
         $('#client-phone_number-error').text('');
 
-
         var $form = $(this),
             first_name = $form.find("input[name='first_name']").val(),
             last_name = $form.find("input[name='last_name']").val(),
@@ -224,20 +223,24 @@ function createVisit() {
     const visitDateInput = document.getElementById('visit_date');
     const specialDateCheck = document.getElementById('specialDateCheck');
 
-    visitDateInput.addEventListener('change', function () {
-        if (this.value === '2023-01-01') {
-            specialDateCheck.checked = true;
-        } else {
-            specialDateCheck.checked = false;
-        }
-    });
+    if (visitDateInput) {
+        visitDateInput.addEventListener('change', function () {
+            if (this.value === '2023-01-01') {
+                specialDateCheck.checked = true;
+            } else {
+                specialDateCheck.checked = false;
+            }
+        });
+    }
 
-    specialDateCheck.addEventListener('change', function () {
-        if (this.checked) {
-            visitDateInput.value = '2023-01-01';
-        }
-    });
-
+    if (specialDateCheck) {
+        specialDateCheck.addEventListener('change', function () {
+            if (this.checked) {
+                visitDateInput.value = '2023-01-01';
+            }
+        });
+    }
+    
     $('#createVisit').on('submit', function (e) {
         e.preventDefault();
 
@@ -390,6 +393,7 @@ function deleteClient(id) {
         dataType: 'json',
         success: function (data) {
             alertMessage.saveMessage(data)
+
             window.location.reload();
         },
         error: function (xhr, status, error) {
