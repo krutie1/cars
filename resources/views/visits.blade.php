@@ -30,42 +30,38 @@
                 </form>
             @endif
 
-            @if(auth()->user()->isAdmin())
-                <form method="GET" action="{{ route('visit.filter') }}">
-                    <input name="custom_search" id="search-input" type="text" class="form-control mb-3"
-                           placeholder="Введите номер телефона, ФИО или предмет проката"
-                           aria-label="Введите номер телефона, ФИО или предмет проката"
-                           aria-describedby="search-button"
-                           value="{{ request('custom_search') }}">
-                    <div class="row pb-3 justify-content-end">
-                        <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
-                            <label for="start">Начало даты</label>
-                            <input type="date" name="start" class="form-control"
-                                   value="{{ request('start') }}"/>
-                        </div>
-                        <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
-                            <label for="end">Конец даты</label>
-                            <input type="date" name="end" class="form-control"
-                                   value="{{ request('end') }}"/>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-3">
-                            <input type="hidden" name="search_query"
-                                   value="{{ request('search_query') }}">
-
-                            <input type="submit" name="action" value="Фильтр"
-                                   class="btn btn-primary w-100"/>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-3">
-                            <input type="submit" name="action" value="Выгрузить"
-                                   class="btn btn-success w-100"/>
-                        </div>
+            {{--            @if(auth()->user()->isAdmin())--}}
+            <form method="GET" action="{{ route('visit.filter') }}">
+                <input name="custom_search" id="search-input" type="text" class="form-control mb-3"
+                       placeholder="Введите номер телефона, ФИО или предмет проката"
+                       aria-label="Введите номер телефона, ФИО или предмет проката"
+                       aria-describedby="search-button"
+                       value="{{ request('custom_search') }}">
+                <div class="row pb-3 justify-content-end">
+                    <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
+                        <label for="start">Начало даты</label>
+                        <input type="date" name="start" class="form-control"
+                               value="{{ request('start') }}"/>
                     </div>
-                </form>
+                    <div class="col-lg-4 col-md-3 col-sm-6 pt-2 pt-md-0">
+                        <label for="end">Конец даты</label>
+                        <input type="date" name="end" class="form-control"
+                               value="{{ request('end') }}"/>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-3">
+                        <input type="hidden" name="search_query"
+                               value="{{ request('search_query') }}">
 
-                <script>
-
-                </script>
-            @endif
+                        <input type="submit" name="action" value="Фильтр"
+                               class="btn btn-primary w-100"/>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-6 align-self-end mt-3">
+                        <input type="submit" name="action" value="Выгрузить"
+                               class="btn btn-success w-100"/>
+                    </div>
+                </div>
+            </form>
+            {{--            @endif--}}
 
 
             @if(!empty($startDate) && !empty($endDate))
