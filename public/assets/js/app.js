@@ -686,8 +686,8 @@ function initVisitPaymentModal() {
         // Extract info from data-bs-* attributes
         var visit = button.data('visit');
 
-        // Clear existing fields
-        $('#payment_fields').empty();
+        // // Clear existing fields
+        // $('#payment_fields').empty();
 
         // Fetch existing payment data
         $.ajax({
