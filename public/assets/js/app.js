@@ -699,6 +699,9 @@ function initVisitPaymentModal() {
                     paymentField.find('select').val(payment.payment_id);
                     paymentField.find('.amount').val(payment.amount);
                     paymentField.appendTo('#payment_fields');
+
+                    console.log(payment.payment_id)
+                    console.log(payment.amount)
                 });
             }
         });
