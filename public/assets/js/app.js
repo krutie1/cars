@@ -696,7 +696,7 @@ function initVisitPaymentModal() {
             success: function (data) {
                 data.forEach(function (payment) {
                     var paymentField = $('#payment_fields .payment-field').first().clone();
-                    paymentField.find('select').val(payment.id);
+                    paymentField.find('select').val(payment.payment_id);
                     paymentField.find('.amount').val(payment.amount);
                     paymentField.appendTo('#payment_fields');
                 });
