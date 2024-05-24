@@ -94,7 +94,7 @@ Route::prefix('/cars')->middleware(['auth'])->group(function () {
     Route::put('/{visit}', [CarController::class, 'update']);
 });
 
-// Cash
+// TRansactions
 Route::prefix('/transactions')->middleware('auth')->group(function () {
     Route::post('/', [TransactionController::class, 'insert'])->name('transactions.insert');
 });

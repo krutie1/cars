@@ -18,6 +18,9 @@ class TransactionController extends Controller
 
         Transaction::create($validated);
 
-        return redirect()->back()->with('success', 'Платёж внесён');
+        return response()->json([
+            'success' => true,
+            'message' => "Платёж внесён"
+        ]);
     }
 }

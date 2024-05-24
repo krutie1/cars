@@ -65,6 +65,7 @@ $(document).ready(function () {
     createManager();
     createVisit();
     createPayment();
+    createCash();
 
     (function () {
         const message = alertMessage.getMessage()
@@ -240,7 +241,7 @@ function createVisit() {
             }
         });
     }
-    
+
     $('#createVisit').on('submit', function (e) {
         e.preventDefault();
 
@@ -297,6 +298,45 @@ function createVisit() {
                 if (xhr.responseJSON.errors.hasOwnProperty('start_time')) {
                     $('#start_time_hour').addClass('is-invalid');
                     $('#visit-start-error').text(xhr.responseJSON.errors.start_time[0]);
+                }
+            }
+        });
+    });
+
+}
+
+function createCash() {
+    $('#createCash').on('submit', function (e) {
+        e.preventDefault();
+
+        // Reset any previous validation errors
+        $('#amount').removeClass('is-invalid');
+        $('#amount-error').text('');
+
+        var $form = $(this),
+            amount = $form.find("input[name='amount']").val(),
+            url = $form.attr('action');
+
+        var data = {
+            amount: amount,
+            _token: '{{ csrf_token() }}', // Include CSRF token for Laravel
+        };
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: function (data) {
+                alertMessage.saveMessage(data);
+                window.location.reload(); // Reload the page or update the UI as needed
+            },
+            error: function (xhr, status, error) {
+                if (xhr.responseJSON.errors.hasOwnProperty('amount')) {
+                    $('#amount').addClass('is-invalid');
+                    $('#amount-error').text(xhr.responseJSON.errors.amount[0]);
+                } else {
+                    console.error(error);
+                    alert('An error occurred. Please try again.');
                 }
             }
         });

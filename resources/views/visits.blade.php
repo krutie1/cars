@@ -172,6 +172,7 @@
             @foreach($totalByType as $type => $amount)
                 <p class="visit-bottom text-center">{{ $type }}: <span>{{ $amount }}</span></p>
             @endforeach
+            <p class="visit-bottom text-center">Диляре: {{ isset($negativeSum) ? $negativeSum : '0' }}</p>
             {{--            <p class="visit-bottom text-center">Диляра: <span>!EachAmount</span> <span class="edit-span">edit</span></p>--}}
             {{--            <p class="visit-bottom text-center">В кассе: !Cass<span>!Amount</span></p>--}}
 

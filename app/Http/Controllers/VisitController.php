@@ -39,7 +39,6 @@ class VisitController extends Controller
 
         $total = 0;
         $totalByType = [];
-
         foreach ($allVisits as $visit) {
             foreach ($visit->transactions as $transaction) {
                 $type = $transaction->paymentsTrashed->name;
@@ -55,11 +54,24 @@ class VisitController extends Controller
             }
         }
 
+        $negativeTransactions = Transaction::query()
+            ->where('amount', '<', 0)
+            ->get();
+
+        $negativeSum = 0;
+        foreach ($negativeTransactions as $transaction) {
+            $amount = $transaction->amount;
+            if ($amount < 0) {
+                $negativeSum += $amount;
+            }
+        }
+        $negativeSum = abs($negativeSum);
+
         $dayAmount = Transaction::query()
             ->where('payment_id', 1)
             ->sum('amount');
 
-        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount'));
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount', 'negativeSum'));
     }
 
     public function store(Request $request)
@@ -356,16 +368,36 @@ class VisitController extends Controller
             $endDate = Carbon::parse($endDate);
         }
 
+        $negativeTransactions = Transaction::query()
+            ->where('amount', '<', 0)
+            ->get();
+
+        $negativeSum = 0;
+        foreach ($negativeTransactions as $transaction) {
+            $amount = $transaction->amount;
+            if ($amount < 0) {
+                $negativeSum += $amount;
+            }
+        }
+        $negativeSum = abs($negativeSum);
+
         $dayAmount = Transaction::query()
             ->whereDate('created_at', '<=', $endDate)
             ->where('payment_id', 1)
             ->sum('amount');
 
-        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount'));
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount', 'negativeSum'));
     }
 
     public function find(Request $request)
     {
+        $startDate = $request->input('start');
+        $endDate = $request->input('end');
+
+        if (!$endDate) {
+            $endDate = now();
+        }
+
         $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
 
         $searchQuery = $request->input('search_query');
@@ -420,7 +452,21 @@ class VisitController extends Controller
             }
         }
 
-        return view('visits', compact('visits', 'payments', 'total', 'totalByType'));
+        if (!empty($startDate)) {
+            $startDate = Carbon::parse($startDate);
+        }
+
+        if (!empty($endDate)) {
+            $endDate = Carbon::parse($endDate);
+        }
+
+
+        $dayAmount = Transaction::query()
+            ->whereDate('created_at', '<=', $endDate)
+            ->where('payment_id', 1)
+            ->sum('amount');
+
+        return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount'));
     }
 
 
