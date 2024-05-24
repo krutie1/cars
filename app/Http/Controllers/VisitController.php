@@ -182,6 +182,19 @@ class VisitController extends Controller
         }
     }
 
+    public function getPaymentData(Visit $visit)
+    {
+        $payments = $visit->transactions->map(function ($transaction) {
+            return [
+                'payment_id' => $transaction->payment_id,
+                'amount' => $transaction->amount
+            ];
+        });
+
+        return response()->json($payments);
+    }
+
+
     public function filter(Request $request)
     {
         $startDate = $request->input('start');

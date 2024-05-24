@@ -686,6 +686,22 @@ function initVisitPaymentModal() {
         // Extract info from data-bs-* attributes
         var visit = button.data('visit');
 
+        // Clear existing fields
+        $('#payment_fields').empty();
+
+        // Fetch existing payment data
+        $.ajax({
+            url: `/visits/${visit}/payment-data`,
+            method: 'GET',
+            success: function (data) {
+                data.forEach(function (payment) {
+                    var paymentField = $('#payment_fields .payment-field').first().clone();
+                    paymentField.find('select').val(payment.payment_id);
+                    paymentField.find('.amount').val(payment.amount);
+                    paymentField.appendTo('#payment_fields');
+                });
+            }
+        });
 
         $('#edit-btn-payment').on('click', function () {
             var payments = [];

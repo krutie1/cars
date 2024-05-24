@@ -50,6 +50,8 @@ Route::prefix('/visits')->middleware('auth')->group(function () {
     Route::put('/{visit}', [VisitController::class, 'update']);
     Route::put('/payment/{visit}', [VisitController::class, 'setPayment']);
     Route::delete('/{visit}', [VisitController::class, 'destroy']);
+    Route::get('/{visit}/payment-data', [VisitController::class, 'getPaymentData']);
+
 });
 
 // Managers Route
