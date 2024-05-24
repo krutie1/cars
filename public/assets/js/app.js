@@ -691,7 +691,7 @@ function initVisitPaymentModal() {
 
         // Fetch existing payment data
         $.ajax({
-            url: `/visits/${visit}/payment-data`,
+            url: `/visits/${visit.id}/payment-data`,
             method: 'GET',
             success: function (data) {
                 data.forEach(function (payment) {
