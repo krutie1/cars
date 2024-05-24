@@ -705,6 +705,35 @@ function editVisit(id) {
     });
 }
 
+function updatePaymentOptions() {
+    var selectedPayments = [];
+
+    // Collect all selected payment options
+    $('.payment-field select').each(function () {
+        var selectedValue = $(this).val();
+        if (selectedValue) {
+            selectedPayments.push(selectedValue);
+        }
+    });
+
+    // Update options in all selects
+    $('.payment-field select').each(function () {
+        var currentSelect = $(this);
+        var currentValue = currentSelect.val();
+
+        currentSelect.find('option').each(function () {
+            var option = $(this);
+            var optionValue = option.val();
+
+            // Disable the option if it is selected in another select
+            if (selectedPayments.includes(optionValue) && optionValue !== currentValue) {
+                option.prop('disabled', true);
+            } else {
+                option.prop('disabled', false);
+            }
+        });
+    });
+}
 
 function initVisitPaymentModal() {
     $('#addPaymentField').click(function () {
@@ -712,6 +741,19 @@ function initVisitPaymentModal() {
         paymentField.find('select').val('');
         paymentField.find('.amount').val('');
         paymentField.appendTo('#payment_fields');
+
+        // Add remove event to the new remove button
+        paymentField.find('.remove-payment-field').click(function () {
+            paymentField.remove();
+            updatePaymentOptions();
+        });
+
+        // Add change event to the new select
+        paymentField.find('select').change(function () {
+            updatePaymentOptions();
+        });
+
+        updatePaymentOptions();
     });
 
     $('#removePayment').click(function () {
@@ -721,6 +763,7 @@ function initVisitPaymentModal() {
         if ($paymentFields.length > 1) {
             // Remove the last payment field
             $paymentFields.last().remove();
+            updatePaymentOptions();
         }
     });
 
@@ -743,9 +786,20 @@ function initVisitPaymentModal() {
                     paymentField.find('select').val(payment.payment_id);
                     paymentField.find('.amount').val(payment.amount);
                     paymentField.appendTo('#payment_fields');
+
+                    // Add remove event to the new remove button
+                    paymentField.find('.remove-payment-field').click(function () {
+                        paymentField.remove();
+                        updatePaymentOptions();
+                    });
+
+                    // Add change event to the new select
+                    paymentField.find('select').change(function () {
+                        updatePaymentOptions();
+                    });
                 });
 
-                console.log(data)
+                updatePaymentOptions();
             }
         });
 
@@ -789,13 +843,18 @@ function editVisitPayment(id, payments, amounts) {
             window.location.reload();
         },
         error: function (xhr, status, error) {
+            console.log(xhr.responseJSON.errors)
             if (xhr.responseJSON.errors.hasOwnProperty('payment_types')) {
+                // Add 'is-invalid' class to payment type select element
                 $('#payment').addClass('is-invalid');
-                $('#visit-type-error').text(xhr.responseJSON.errors.payment_amounts[0]);
+                // Display the error message next to the payment type select
+                $('.payment-type-error').text(xhr.responseJSON.errors.payment_types[0]);
             }
-            if (xhr.responseJSON.errors.hasOwnProperty('start_time')) {
-                $('#start_time_hour').addClass('is-invalid');
-                $('#visit-start-error').text(xhr.responseJSON.errors.start_time[0]);
+            if (xhr.responseJSON.errors.hasOwnProperty('payment_amounts')) {
+                // Add 'is-invalid' class to amount input element
+                $('.amount').addClass('is-invalid');
+                // Display the error message next to the amount input
+                $('#visit-amount-error').text(xhr.responseJSON.errors.payment_amounts[0]);
             }
         }
     });

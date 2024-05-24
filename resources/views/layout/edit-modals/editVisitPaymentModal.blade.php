@@ -20,26 +20,10 @@
                                         <option value="{{ $paymentId }}">{{ $paymentName }}</option>
                                     @endforeach
                                 </select>
+                                <div class="invalid-feedback payment-type-error"></div>
                             </div>
                             <div class="col-md-6 mt-3 align-self-end">
                                 <input type="number" class="form-control amount" placeholder="Сумма"/>
-                            </div>
-                        </div>
-                        <div class="mb-3 payment-field row">
-                            <div class="col-md-6">
-                                <label for="payment" class="col-form-label">Выберите тип оплаты:</label>
-                                <select name="payment[]" class="form-select" id="payment">
-                                    @foreach($payments as $paymentId => $paymentName)
-                                        <option value="{{ $paymentId }}">{{ $paymentName }}</option>
-                                    @endforeach
-                                </select>
-
-                                <div id="visit-type-error" class="invalid-feedback"></div>
-                            </div>
-                            <div class="col-md-6 mt-3 align-self-end">
-                                <input type="number" name="amounts[]" class="form-control amount"
-                                       placeholder="Сумма" id="amount">
-
                                 <div id="visit-amount-error" class="invalid-feedback"></div>
                             </div>
                         </div>
