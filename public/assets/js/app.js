@@ -703,6 +703,8 @@ function initVisitPaymentModal() {
                     console.log(payment.payment_id)
                     console.log(payment.amount)
                 });
+
+                console.log(data)
             }
         });
 
