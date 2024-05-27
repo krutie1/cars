@@ -369,6 +369,7 @@ class VisitController extends Controller
         }
 
         $negativeTransactions = Transaction::query()
+            ->whereDate('created_at', '<=', $endDate)
             ->where('amount', '<', 0)
             ->get();
 
