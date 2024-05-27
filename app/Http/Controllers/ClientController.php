@@ -20,6 +20,16 @@ class ClientController extends Controller
             'unique' => 'Пользователь с таким номером телефона уже существует',
         ]);
 
+        // Check if a client with the same phone number already exists, including soft deleted clients
+        $existingClient = Client::where('phone_number', $validated['phone_number'])->first();
+
+        if ($existingClient) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Пользователь с таким номером телефона уже существует',
+            ], 400);
+        }
+
         $client = Client::create($validated);
 
         return response()->json([
