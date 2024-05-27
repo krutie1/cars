@@ -11,8 +11,8 @@ class ClientController extends Controller
 {
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'phone_number' => ['required', 'regex:/^8\d{10}$/', (new Unique('clients'))->withoutTrashed()],
+        $validator = Validator::make($request->all(), [
+            'phone_number' => ['required', 'regex:/^8\d{10}$/'],
             'first_name' => 'required',
             'last_name' => 'nullable',
             'patronymic' => 'nullable'
@@ -20,7 +20,27 @@ class ClientController extends Controller
             'unique' => 'Пользователь с таким номером телефона уже существует',
         ]);
 
-        $client = Client::create($validated);
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        // Check if client already exists
+        $phone_number = $request->input('phone_number');
+        $existingClient = Client::where('phone_number', $phone_number)->first();
+
+        if ($existingClient) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Пользователь с таким номером телефона уже существует'
+            ], 409); // 409 Conflict status code
+        }
+
+        // If not, create a new client
+        $client = Client::create($validator->validated());
 
         return response()->json([
             'success' => true,
