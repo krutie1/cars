@@ -220,31 +220,39 @@ class VisitController extends Controller
 
         $visits = Visit::with($with)->orderBy('id', 'desc');
 
-        // Only apply date filtering if at least one date is provided
-        if ($startDate || $endDate) {
-            if (!$startDate) {
-                $startDate = '1970-01-01'; // Far past date to include all records from the start
-            }
-            if (!$endDate) {
-                $endDate = now(); // Default to today's date
-            }
+        // Apply date filtering based on the provided dates
+        if (!empty($startDate) || !empty($endDate)) {
+            try {
+                if (!empty($startDate)) {
+                    $startDate = Carbon::parse($startDate);
+                }
+                if (!empty($endDate)) {
+                    $endDate = Carbon::parse($endDate);
+                }
 
-            $visits
-                ->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate);
+                if (!empty($startDate) && !empty($endDate)) {
+                    $visits->whereBetween('created_at', [$startDate, $endDate]);
+                } elseif (!empty($startDate)) {
+                    $visits->whereDate('created_at', '>=', $startDate);
+                } elseif (!empty($endDate)) {
+                    $visits->whereDate('created_at', '<=', $endDate);
+                }
+            } catch (\Exception $e) {
+                // Handle invalid date formats
+                return redirect()->back()->withErrors(['Invalid date format']);
+            }
         }
 
         // Apply search query filtering
-        if ($searchQuery) {
+        if (!empty($searchQuery)) {
             $visits->where(function ($query) use ($searchQuery) {
-                $query
-                    ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
-                        $query->where(function ($q) use ($searchQuery) {
-                            return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
-                                ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
-                                ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
-                        });
-                    })
+                $query->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                    $query->where(function ($q) use ($searchQuery) {
+                        $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                            ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                            ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                    });
+                })
                     ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
                         $query->where('name', 'like', '%' . $searchQuery . '%');
                     });
@@ -326,19 +334,17 @@ class VisitController extends Controller
 
         $this->calculateTotalPayments($visits);
 
-        if (!empty($startDate)) {
-            $startDate = Carbon::parse($startDate);
+        // Date range for negative transactions
+        $negativeTransactionsQuery = Transaction::query()->where('amount', '<', 0);
+        if (!empty($startDate) && !empty($endDate)) {
+            $negativeTransactionsQuery->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif (!empty($startDate)) {
+            $negativeTransactionsQuery->whereDate('created_at', '>=', $startDate);
+        } elseif (!empty($endDate)) {
+            $negativeTransactionsQuery->whereDate('created_at', '<=', $endDate);
         }
-
-        if (!empty($endDate)) {
-            $endDate = Carbon::parse($endDate);
-        }
-
-        $negativeTransactions = Transaction::query()
-            ->whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate)
-            ->where('amount', '<', 0)
-            ->get();
+        // Fetch all negative transactions if both startDate and endDate are empty
+        $negativeTransactions = $negativeTransactionsQuery->get();
 
         $negativeSum = 0;
         foreach ($negativeTransactions as $transaction) {
@@ -349,10 +355,12 @@ class VisitController extends Controller
         }
         $negativeSum = abs($negativeSum);
 
-        $dayAmount = Transaction::query()
-            ->whereDate('created_at', '<=', $endDate)
-            ->where('payment_id', 1)
-            ->sum('amount');
+        // Date range for day amount
+        $dayAmountQuery = Transaction::query()->where('payment_id', 1);
+        if (!empty($endDate)) {
+            $dayAmountQuery->whereDate('created_at', '<=', $endDate);
+        }
+        $dayAmount = $dayAmountQuery->sum('amount');
 
         return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount', 'negativeSum'));
     }
