@@ -220,6 +220,9 @@ class VisitController extends Controller
 
         $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
 
+        if (!$startDate) {
+            $startDate = now();
+        }
         if (!$endDate) {
             $endDate = now();
         }
@@ -369,7 +372,8 @@ class VisitController extends Controller
         }
 
         $negativeTransactions = Transaction::query()
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
             ->where('amount', '<', 0)
             ->get();
 
@@ -383,7 +387,8 @@ class VisitController extends Controller
         $negativeSum = abs($negativeSum);
 
         $dayAmount = Transaction::query()
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
             ->where('payment_id', 1)
             ->sum('amount');
 
