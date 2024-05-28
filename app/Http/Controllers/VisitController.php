@@ -205,14 +205,12 @@ class VisitController extends Controller
 
         return response()->json($payments);
     }
-
-
+    
     public function filter(Request $request)
     {
         $startDate = $request->input('start');
         $endDate = $request->input('end');
         $searchQuery = $request->input('custom_search');
-
         $action = $request->input('action');
 
         Log::error($searchQuery);
@@ -220,68 +218,42 @@ class VisitController extends Controller
 
         $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
 
-        if (!$startDate) {
-            $startDate = now();
-        }
-        if (!$endDate) {
-            $endDate = now();
-        }
+        $visits = Visit::with($with)->orderBy('id', 'desc');
 
-        $visits = Visit::with($with)
-            ->orderBy('id', 'desc');
+        // Only apply date filtering if at least one date is provided
+        if ($startDate || $endDate) {
+            if (!$startDate) {
+                $startDate = '1970-01-01'; // Far past date to include all records from the start
+            }
+            if (!$endDate) {
+                $endDate = now(); // Default to today's date
+            }
 
-        if ($startDate) {
             $visits
                 ->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate)
-                ->where(function ($query) use ($searchQuery) {
-                    $query
-                        ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
-                            $query->when($searchQuery, function ($query) use ($searchQuery) {
-                                $query->where(function ($q) use ($searchQuery) {
-                                    return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
-                                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
-                                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
-                                });
-                            });
-                        })
-                        ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
-                            $query->when($searchQuery, function ($query) use ($searchQuery) {
-                                $query->where('name', 'like', '%' . $searchQuery . '%');
-                            });
-                        });
-                })
-                ->orderBy('id', 'desc');
-        } else {
-//            if (auth()->user()->isAdmin()) {
-            $visits
-                ->whereDate('created_at', '<=', $endDate)
-                ->where(function ($query) use ($searchQuery) {
-                    $query
-                        ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
-                            $query->when($searchQuery, function ($query) use ($searchQuery) {
-                                $query->where(function ($q) use ($searchQuery) {
-                                    return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
-                                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
-                                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
-                                });
-                            });
-                        })
-                        ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
-                            $query->when($searchQuery, function ($query) use ($searchQuery) {
-                                $query->where('name', 'like', '%' . $searchQuery . '%');
-                            });
-                        });
-                });
-//            } else {
-//                $visits->whereDate('created_at', now());
-//            }
+                ->whereDate('created_at', '<=', $endDate);
         }
 
-        // chck action
+        // Apply search query filtering
+        if ($searchQuery) {
+            $visits->where(function ($query) use ($searchQuery) {
+                $query
+                    ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                        $query->where(function ($q) use ($searchQuery) {
+                            return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                                ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                                ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                        });
+                    })
+                    ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                        $query->where('name', 'like', '%' . $searchQuery . '%');
+                    });
+            });
+        }
+
+        // Handle the export action
         if ($action == 'Выгрузить') {
             $visitsData = $visits->get();
-
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
@@ -294,10 +266,9 @@ class VisitController extends Controller
 
             // Populate data
             $row = 2;
-            $transactionTypes = []; // Array to store unique transaction types
+            $transactionTypes = [];
 
             foreach ($visitsData as $visit) {
-                // Set the common data for each visit
                 $sheet->setCellValue('A' . $row, $visit->carTrashed->name);
                 $sheet->setCellValue('B' . $row, $visit->clientTrashed->last_name . ' ' . $visit->clientTrashed->first_name . ' ' . $visit->clientTrashed->patronymic);
                 $sheet->setCellValue('C' . $row, $visit->comment);
@@ -308,33 +279,26 @@ class VisitController extends Controller
                     $type = $transaction->paymentsTrashed->name;
                     $amount = $transaction->amount;
 
-                    // Check if the type already exists in the array
                     if (!isset($transactionTypes[$type])) {
-                        // Add the type to the array
-                        $transactionTypes[$type] = count($transactionTypes) + 6; // Calculate the column index
-                        $sheet->setCellValue([$transactionTypes[$type], 1], $type); // Set the column header
+                        $transactionTypes[$type] = count($transactionTypes) + 6;
+                        $sheet->setCellValue([$transactionTypes[$type], 1], $type);
                     }
 
-                    // Set the value in the corresponding column for the type
-                    $sheet->setCellValue([$transactionTypes[$type], $row], $amount); // Set the cell value
+                    $sheet->setCellValue([$transactionTypes[$type], $row], $amount);
                 }
 
                 $row++;
             }
 
-            // Set headers for download
             $filename = 'visits.xlsx';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="' . $filename . '"');
             header('Cache-Control: max-age=0');
 
-            // Save the spreadsheet to output
             $writer = new Xlsx($spreadsheet);
             $writer->save('php://output');
-
             exit();
         }
-
 
         $totalByType = [];
         $total = 0;
@@ -355,7 +319,6 @@ class VisitController extends Controller
                 }
             }
         });
-
 
         $visits = $visits->paginate(7)->appends(request()->query());
 
@@ -393,6 +356,7 @@ class VisitController extends Controller
 
         return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount', 'negativeSum'));
     }
+
 
     public function find(Request $request)
     {
