@@ -220,6 +220,9 @@ class VisitController extends Controller
 
         $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
 
+        if (!$startDate) {
+            $startDate = now();
+        }
         if (!$endDate) {
             $endDate = now();
         }
@@ -368,19 +371,11 @@ class VisitController extends Controller
             $endDate = Carbon::parse($endDate);
         }
 
-        $negativeTransactions = Transaction::query();
-
-        if ($startDate) {
-            $negativeTransactions->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate)
-                ->where('amount', '<', 0)
-                ->get();
-        } else {
-            $negativeTransactions->whereDate('created_at', '<=', $endDate)
-                ->where('amount', '<', 0)
-                ->get();
-        }
-
+        $negativeTransactions = Transaction::query()
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->where('amount', '<', 0)
+            ->get();
 
         $negativeSum = 0;
         foreach ($negativeTransactions as $transaction) {
