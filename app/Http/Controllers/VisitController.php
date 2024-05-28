@@ -281,6 +281,7 @@ class VisitController extends Controller
         // chck action
         if ($action == 'Выгрузить') {
             $visitsData = $visits->get();
+            Log::error($visitsData);
 
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
