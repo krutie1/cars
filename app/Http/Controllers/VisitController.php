@@ -215,12 +215,11 @@ class VisitController extends Controller
 
         $action = $request->input('action');
 
-        Log::error($searchQuery);
         $total = 0;
 
         $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
 
-        if (!$startDate) {
+        if (!$startDate && !$searchQuery) {
             $startDate = now();
         }
         if (!$endDate) {
