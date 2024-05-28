@@ -205,12 +205,14 @@ class VisitController extends Controller
 
         return response()->json($payments);
     }
-    
+
+
     public function filter(Request $request)
     {
         $startDate = $request->input('start');
         $endDate = $request->input('end');
         $searchQuery = $request->input('custom_search');
+
         $action = $request->input('action');
 
         Log::error($searchQuery);
@@ -218,50 +220,65 @@ class VisitController extends Controller
 
         $with = ['transactions', 'transactions.paymentsTrashed', 'clientTrashed', 'userTrashed', 'carTrashed', 'paymentsTrashed'];
 
-        $visits = Visit::with($with)->orderBy('id', 'desc');
-
-        // Apply date filtering based on the provided dates
-        if (!empty($startDate) || !empty($endDate)) {
-            try {
-                if (!empty($startDate)) {
-                    $startDate = Carbon::parse($startDate);
-                }
-                if (!empty($endDate)) {
-                    $endDate = Carbon::parse($endDate);
-                }
-
-                if (!empty($startDate) && !empty($endDate)) {
-                    $visits->whereBetween('created_at', [$startDate, $endDate]);
-                } elseif (!empty($startDate)) {
-                    $visits->whereDate('created_at', '>=', $startDate);
-                } elseif (!empty($endDate)) {
-                    $visits->whereDate('created_at', '<=', $endDate);
-                }
-            } catch (\Exception $e) {
-                // Handle invalid date formats
-                return redirect()->back()->withErrors(['Invalid date format']);
-            }
+        if (!$endDate) {
+            $endDate = now();
         }
 
-        // Apply search query filtering
-        if (!empty($searchQuery)) {
-            $visits->where(function ($query) use ($searchQuery) {
-                $query->whereHas('clientTrashed', function ($query) use ($searchQuery) {
-                    $query->where(function ($q) use ($searchQuery) {
-                        $q->where('phone_number', 'like', '%' . $searchQuery . '%')
-                            ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
-                            ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
-                    });
+        $visits = Visit::with($with)
+            ->orderBy('id', 'desc');
+
+        if ($startDate) {
+            $visits
+                ->whereDate('created_at', '>=', $startDate)
+                ->whereDate('created_at', '<=', $endDate)
+                ->where(function ($query) use ($searchQuery) {
+                    $query
+                        ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where(function ($q) use ($searchQuery) {
+                                    return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                                });
+                            });
+                        })
+                        ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where('name', 'like', '%' . $searchQuery . '%');
+                            });
+                        });
                 })
-                    ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
-                        $query->where('name', 'like', '%' . $searchQuery . '%');
-                    });
-            });
+                ->orderBy('id', 'desc');
+        } else {
+//            if (auth()->user()->isAdmin()) {
+            $visits
+                ->whereDate('created_at', '<=', $endDate)
+                ->where(function ($query) use ($searchQuery) {
+                    $query
+                        ->whereHas('clientTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where(function ($q) use ($searchQuery) {
+                                    return $q->where('phone_number', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('first_name', 'like', '%' . $searchQuery . '%')
+                                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                                });
+                            });
+                        })
+                        ->orWhereHas('carTrashed', function ($query) use ($searchQuery) {
+                            $query->when($searchQuery, function ($query) use ($searchQuery) {
+                                $query->where('name', 'like', '%' . $searchQuery . '%');
+                            });
+                        });
+                });
+//            } else {
+//                $visits->whereDate('created_at', now());
+//            }
         }
 
-        // Handle the export action
+        // chck action
         if ($action == 'Выгрузить') {
             $visitsData = $visits->get();
+
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
@@ -274,9 +291,10 @@ class VisitController extends Controller
 
             // Populate data
             $row = 2;
-            $transactionTypes = [];
+            $transactionTypes = []; // Array to store unique transaction types
 
             foreach ($visitsData as $visit) {
+                // Set the common data for each visit
                 $sheet->setCellValue('A' . $row, $visit->carTrashed->name);
                 $sheet->setCellValue('B' . $row, $visit->clientTrashed->last_name . ' ' . $visit->clientTrashed->first_name . ' ' . $visit->clientTrashed->patronymic);
                 $sheet->setCellValue('C' . $row, $visit->comment);
@@ -287,26 +305,33 @@ class VisitController extends Controller
                     $type = $transaction->paymentsTrashed->name;
                     $amount = $transaction->amount;
 
+                    // Check if the type already exists in the array
                     if (!isset($transactionTypes[$type])) {
-                        $transactionTypes[$type] = count($transactionTypes) + 6;
-                        $sheet->setCellValue([$transactionTypes[$type], 1], $type);
+                        // Add the type to the array
+                        $transactionTypes[$type] = count($transactionTypes) + 6; // Calculate the column index
+                        $sheet->setCellValue([$transactionTypes[$type], 1], $type); // Set the column header
                     }
 
-                    $sheet->setCellValue([$transactionTypes[$type], $row], $amount);
+                    // Set the value in the corresponding column for the type
+                    $sheet->setCellValue([$transactionTypes[$type], $row], $amount); // Set the cell value
                 }
 
                 $row++;
             }
 
+            // Set headers for download
             $filename = 'visits.xlsx';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="' . $filename . '"');
             header('Cache-Control: max-age=0');
 
+            // Save the spreadsheet to output
             $writer = new Xlsx($spreadsheet);
             $writer->save('php://output');
+
             exit();
         }
+
 
         $totalByType = [];
         $total = 0;
@@ -328,23 +353,34 @@ class VisitController extends Controller
             }
         });
 
+
         $visits = $visits->paginate(7)->appends(request()->query());
 
         $payments = Payment::pluck('name', 'id');
 
         $this->calculateTotalPayments($visits);
 
-        // Date range for negative transactions
-        $negativeTransactionsQuery = Transaction::query()->where('amount', '<', 0);
-        if (!empty($startDate) && !empty($endDate)) {
-            $negativeTransactionsQuery->whereBetween('created_at', [$startDate, $endDate]);
-        } elseif (!empty($startDate)) {
-            $negativeTransactionsQuery->whereDate('created_at', '>=', $startDate);
-        } elseif (!empty($endDate)) {
-            $negativeTransactionsQuery->whereDate('created_at', '<=', $endDate);
+        if (!empty($startDate)) {
+            $startDate = Carbon::parse($startDate);
         }
-        // Fetch all negative transactions if both startDate and endDate are empty
-        $negativeTransactions = $negativeTransactionsQuery->get();
+
+        if (!empty($endDate)) {
+            $endDate = Carbon::parse($endDate);
+        }
+
+        $negativeTransactions = Transaction::query();
+
+        if ($startDate) {
+            $negativeTransactions->whereDate('created_at', '>=', $startDate)
+                ->whereDate('created_at', '<=', $endDate)
+                ->where('amount', '<', 0)
+                ->get();
+        } else {
+            $negativeTransactions->whereDate('created_at', '<=', $endDate)
+                ->where('amount', '<', 0)
+                ->get();
+        }
+
 
         $negativeSum = 0;
         foreach ($negativeTransactions as $transaction) {
@@ -355,16 +391,13 @@ class VisitController extends Controller
         }
         $negativeSum = abs($negativeSum);
 
-        // Date range for day amount
-        $dayAmountQuery = Transaction::query()->where('payment_id', 1);
-        if (!empty($endDate)) {
-            $dayAmountQuery->whereDate('created_at', '<=', $endDate);
-        }
-        $dayAmount = $dayAmountQuery->sum('amount');
+        $dayAmount = Transaction::query()
+            ->whereDate('created_at', '<=', $endDate)
+            ->where('payment_id', 1)
+            ->sum('amount');
 
         return view('visits', compact('visits', 'payments', 'startDate', 'endDate', 'total', 'totalByType', 'dayAmount', 'negativeSum'));
     }
-
 
     public function find(Request $request)
     {
