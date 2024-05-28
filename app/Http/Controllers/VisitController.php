@@ -369,7 +369,7 @@ class VisitController extends Controller
         }
 
         $negativeTransactions = Transaction::query()
-            ->whereDate('created_at', '<=', $endDate)
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->where('amount', '<', 0)
             ->get();
 
@@ -383,7 +383,7 @@ class VisitController extends Controller
         $negativeSum = abs($negativeSum);
 
         $dayAmount = Transaction::query()
-            ->whereDate('created_at', '<=', $endDate)
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->where('payment_id', 1)
             ->sum('amount');
 
