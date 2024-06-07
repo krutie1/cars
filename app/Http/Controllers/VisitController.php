@@ -567,7 +567,7 @@ class VisitController extends Controller
             $discountedPrice = $totalPrice * 0.5;
         }
 
-//        $discountedPrice = ceil($discountedPrice / 10) * 10;
+        $discountedPrice = ceil($discountedPrice / 10) * 10;
 
         $visit->cost = $discountedPrice;
         $visit->save();
