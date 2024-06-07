@@ -567,7 +567,17 @@ class VisitController extends Controller
             $discountedPrice = $totalPrice * 0.5;
         }
 
-        $discountedPrice = ceil($discountedPrice / 10) * 10;
+        function customRound($price) {
+            if ($price % 10 == 5) {
+                return $price; // If the price ends with 5, return it as is
+            } elseif ($price % 10 < 5) {
+                return floor($price / 10) * 10; // If lower than 5, round down
+            } else {
+                return ceil($price / 10) * 10; // If higher than 5, round up
+            }
+        }
+
+        $discountedPrice = customRound($discountedPrice);
 
         $visit->cost = $discountedPrice;
         $visit->save();
