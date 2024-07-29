@@ -121,12 +121,7 @@ class VisitController extends Controller
         if ($visitsCount % 10 === 0) {
             $discount = 100;
 
-            $transaction = new Transaction([
-                'visit_id' => $visit->id,
-                'payment_id' => 1,
-                'amount' => 0,
-            ]);
-            $transaction->save();
+            $visit->payment_date = now();
         } else if ($visitsCount % 5 === 0) {
             $discount = 50;
         }
