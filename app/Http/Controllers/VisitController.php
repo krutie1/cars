@@ -120,6 +120,13 @@ class VisitController extends Controller
 
         if ($visitsCount % 10 === 0) {
             $discount = 100;
+
+            $transaction = new Transaction([
+                'visit_id' => $visit->id,
+                'payment_id' => 1,
+                'amount' => 0,
+            ]);
+            $transaction->save();
         } else if ($visitsCount % 5 === 0) {
             $discount = 50;
         }
@@ -563,6 +570,8 @@ class VisitController extends Controller
 
         if ($visitDiscount == 100) {
             $discountedPrice = 0;
+
+
         } else if ($visitDiscount == 50) {
             $discountedPrice = $totalPrice * 0.5;
         }
@@ -581,9 +590,6 @@ class VisitController extends Controller
 
         $visit->cost = $discountedPrice;
         $visit->save();
-
-        Log::error("total price: $totalPrice");
-        Log::error("discounted price: $discountedPrice");
 
         return response()->json([
             'success' => true,
