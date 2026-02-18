@@ -65,8 +65,8 @@ class PriceController extends Controller
 
         for ($i = 2; $i <= $maxMins + 1; $i++) {
             // current cells
-            $cA = $spreadsheet->getActiveSheet()->getCell("A{$i}")->getValue();
-            $cB = $spreadsheet->getActiveSheet()->getCell("B{$i}")->getValue();
+            $cA = $spreadsheet->getActiveSheet()->getCell("A{$i}")->getCalculatedValue();
+            $cB = $spreadsheet->getActiveSheet()->getCell("B{$i}")->getCalculatedValue();
 
             // check if both cells are not numeric (headers row)
             if (!is_numeric($cA) && !is_numeric($cB)) {
